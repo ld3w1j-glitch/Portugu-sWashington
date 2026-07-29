@@ -417,17 +417,20 @@ def build_regular_forms(lemma: str) -> set[str]:
     if ending == "ar":
         tails = (
             "o as a am amos ava avas avam avamos ei aste ou aram aria arias "
-            "ariam ariamos ando ado"
+            "ariam ariamos arei aras ara aremos areis arao ando ado "
+            "e es emos em asse asses assemos assem ares armos aredes"
         ).split()
     elif ending == "er":
         tails = (
             "o es e em emos ia ias iam iamos i este eu eram eria erias eriam "
-            "eriamos endo ido"
+            "eriamos erei eras era eremos ereis erao endo ido "
+            "a as am amos esse esses essemos essem eres ermos erdes"
         ).split()
     else:
         tails = (
             "o es e em imos ia ias iam iamos i iste iu iram iria irias iriam "
-            "iriamos indo ido"
+            "iriamos irei iras ira iremos ireis irao indo ido "
+            "a as am amos isse isses issemos issem ires irmos irdes"
         ).split()
     forms.update(stem + tail for tail in tails)
     return {normalize(form) for form in forms}
@@ -438,6 +441,379 @@ for _lemma in REGULAR_VERBS:
     for _form in build_regular_forms(_lemma):
         VERB_FORMS[_form] = _lemma
 VERB_FORMS.update(IRREGULAR_FORMS)
+
+# ---------------------------------------------------------------------------
+# Camada ampliada do motor 2.0
+# ---------------------------------------------------------------------------
+
+ENGINE_VERSION = "2.0"
+
+EXTRA_REGULAR_VERBS = normalized_set(
+    """
+    abandonar aceitar acompanhar acontecer acordar adicionar admitir agradecer alugar
+    alcançar andar anunciar aparecer aplicar apresentar aproveitar aprovar avisar
+    beber buscar calcular causar começar comentar compreender concordar conhecer consultar
+    continuar conversar corrigir criar cuidar deixar depender desejar descobrir
+    considerar discutir ensinar entender entrar enviar esperar esquecer evitar fechar formar ganhar gerar
+    identificar informar iniciar instalar lembrar levar ligar machucar mudar necessitar
+    mostrar obedecer observar oferecer organizar pagar passar perceber permanecer pesquisar
+    planejar praticar preparar produzir publicar reconhecer registrar retornar salvar
+    significar solicitar terminar tentar utilizar vender viajar visitar
+    """
+)
+
+for _lemma in EXTRA_REGULAR_VERBS:
+    if _lemma.endswith(("ar", "er", "ir")):
+        for _form in build_regular_forms(_lemma):
+            VERB_FORMS.setdefault(_form, _lemma)
+
+EXTRA_IRREGULAR_FORMS = {
+    # saber
+    "sei": "saber",
+    "sabe": "saber",
+    "sabem": "saber",
+    "sabia": "saber",
+    "soube": "saber",
+    "souberam": "saber",
+    # trazer
+    "trago": "trazer",
+    "traz": "trazer",
+    "trazem": "trazer",
+    "trouxe": "trazer",
+    "trouxeram": "trazer",
+    # pôr
+    "ponho": "pôr",
+    "poe": "pôr",
+    "poem": "pôr",
+    "pus": "pôr",
+    "pos": "pôr",
+    "puseram": "pôr",
+    # pedir
+    "peco": "pedir",
+    "pede": "pedir",
+    "pedem": "pedir",
+    "pediu": "pedir",
+    "pediram": "pedir",
+    # conseguir
+    "consigo": "conseguir",
+    "consegue": "conseguir",
+    "conseguem": "conseguir",
+    "conseguiu": "conseguir",
+    "conseguiram": "conseguir",
+    # dormir
+    "durmo": "dormir",
+    "dorme": "dormir",
+    "dormem": "dormir",
+    "dormiu": "dormir",
+    "dormiram": "dormir",
+    # sentir
+    "sinto": "sentir",
+    "sente": "sentir",
+    "sentem": "sentir",
+    "sentiu": "sentir",
+    "sentiram": "sentir",
+    # ouvir
+    "ouco": "ouvir",
+    "ouve": "ouvir",
+    "ouvem": "ouvir",
+    "ouviu": "ouvir",
+    "ouviram": "ouvir",
+    # sair/cair
+    "saio": "sair",
+    "sai": "sair",
+    "saem": "sair",
+    "saiu": "sair",
+    "sairam": "sair",
+    "caio": "cair",
+    "cai": "cair",
+    "caem": "cair",
+    "caiu": "cair",
+    "cairam": "cair",
+    # manter
+    "mantenho": "manter",
+    "mantem": "manter",
+    "mantemos": "manter",
+    "mantinha": "manter",
+    "manteve": "manter",
+    # dever
+    "devo": "dever",
+    "deve": "dever",
+    "devem": "dever",
+    "devia": "dever",
+    "deveria": "dever",
+    # poder
+    "pude": "poder",
+    "puderam": "poder",
+    "podera": "poder",
+    "poderia": "poder",
+    # querer
+    "quis": "querer",
+    "quiseram": "querer",
+    "queria": "querer",
+    # dizer
+    "digo": "dizer",
+    "dizia": "dizer",
+    "disseram": "dizer",
+    # ver/vir
+    "vemos": "ver",
+    "viram": "ver",
+    "vinha": "vir",
+    "vinham": "vir",
+    "venho": "vir",
+    # ler/escrever
+    "lemos": "ler",
+    "leram": "ler",
+    "escrevo": "escrever",
+    "escreve": "escrever",
+    "escrevem": "escrever",
+    "escreveu": "escrever",
+    "escreveram": "escrever",
+    # dar
+    "damos": "dar",
+    "deram": "dar",
+    "dava": "dar",
+    # formas com alterações ortográficas
+    "cheguei": "chegar",
+    "fiquei": "ficar",
+    "paguei": "pagar",
+    "comecei": "começar",
+    "conheci": "conhecer",
+    "corrigi": "corrigir",
+    "viajei": "viajar",
+    # futuros do pretérito irregulares e frequentes
+    "viria": "vir",
+    "viriam": "vir",
+    "diria": "dizer",
+    "diriam": "dizer",
+    "faria": "fazer",
+    "fariam": "fazer",
+    "teria": "ter",
+    "teriam": "ter",
+    "seria": "ser",
+    "seriam": "ser",
+    "estaria": "estar",
+    "estariam": "estar",
+    # futuros irregulares ou muito frequentes
+    "sera": "ser",
+    "serao": "ser",
+    "tera": "ter",
+    "terao": "ter",
+    "fara": "fazer",
+    "farao": "fazer",
+    "poderao": "poder",
+    "devera": "dever",
+    "deverao": "dever",
+    "vira": "vir",
+    "virao": "vir",
+    # formas imperativas/subjuntivas muito frequentes
+    "abra": "abrir",
+    "abram": "abrir",
+    "faca": "fazer",
+    "facam": "fazer",
+    "leia": "ler",
+    "leiam": "ler",
+    "saia": "sair",
+    "saiam": "sair",
+    "seja": "ser",
+    "sejam": "ser",
+    "venha": "vir",
+    "venham": "vir",
+    "veja": "ver",
+    "vejam": "ver",
+    "fosse": "ser/ir",
+    "fossem": "ser/ir",
+    "estivesse": "estar",
+    "estivessem": "estar",
+    "tivesse": "ter",
+    "tivessem": "ter",
+    "fizesse": "fazer",
+    "fizessem": "fazer",
+    "pudesse": "poder",
+    "pudessem": "poder",
+    "viesse": "vir",
+    "viessem": "vir",
+}
+VERB_FORMS.update(EXTRA_IRREGULAR_FORMS)
+
+ACCENTED_VERB_FORMS.update(
+    {
+        "põe": "pôr",
+        "põem": "pôr",
+        "mantém": "manter",
+        "mantêm": "manter",
+        "lê": "ler",
+        "vêem": "ver",
+        "saí": "sair",
+        "caí": "cair",
+    }
+)
+
+COMMON_ADJECTIVES.update(
+    normalized_set(
+        """
+        antigo antiga atento atenta atual automático automática brasileiro brasileira
+        cansado cansada caro cara completo completa correto correta dedicado dedicada
+        diferente disponíveis disponível eficiente feliz importante impossível
+        interessado interessada livre local necessário necessária novo nova ótimo ótima
+        pequeno pequena possível principal provável rápido rápida responsável simples
+        silencioso silenciosa suficiente verdadeiro verdadeira
+        """
+    )
+)
+
+COMMON_NOUNS.update(
+    normalized_set(
+        """
+        atividade atividades ajuda aluno alunos análise análises ano anos apoio arquivo
+        arquivos aula aulas bairro caderno cadernos candidato candidatos carro carros
+        casa casas cidade cidades cliente clientes computador computadores conteúdo
+        conteúdos curso cursos dia dias diretor diretora dúvida dúvidas equipe equipes
+        escola escolas exercício exercícios funcionário funcionários história horas
+        informação informações lugar lugares material materiais mercadoria mercadorias
+        mês meses notícia notícias palavra palavras pergunta perguntas problema problemas
+        projeto projetos relatório relatórios resposta respostas música músicas sistema sistemas tarefa
+        tarefas texto textos usuário usuários vaga vagas
+        """
+    )
+)
+
+PERSONAL_SUBJECT_PRONOUNS = normalized_set(
+    "eu tu ele ela nós vós eles elas você vocês a gente"
+)
+
+AUXILIARY_VERBS = normalized_set(
+    "ter haver ser estar ir poder dever querer começar continuar deixar acabar voltar"
+)
+
+IMPERSONAL_WEATHER_VERBS = normalized_set(
+    "chover nevar gear trovejar relampejar amanhecer anoitecer ventar"
+)
+
+SPEECH_COGNITION_VERBS = normalized_set(
+    "achar acreditar afirmar compreender considerar dizer entender esperar explicar "
+    "imaginar informar perceber perguntar responder saber supor desejar querer"
+)
+
+OBJECT_PREDICATIVE_VERBS = normalized_set(
+    "achar considerar declarar eleger julgar nomear tornar"
+)
+
+TIME_NOUNS = normalized_set(
+    "agora ano anos dia dias hora horas hoje manhã mês meses noite ontem tarde semana semanas"
+)
+
+PLACE_NOUNS = normalized_set(
+    "aqui ali casa cidade escola fora dentro lugar mercado rua trabalho pouso alegre"
+)
+
+ABSTRACT_NOUNS = normalized_set(
+    """
+    amor aversão certeza confiança desejo dúvida esperança medo necessidade orgulho
+    preocupação referência respeito saudade vontade
+    """
+)
+
+IMPERATIVE_FORMS = normalized_set(
+    """
+    abra abram faça façam fale falem leia leiam olhe olhem preste prestem responda
+    respondam saia saiam seja sejam venha venham veja vejam
+    """
+)
+
+COORDINATING_CONNECTORS = {
+    "e": "coordenada sindética aditiva",
+    "nem": "coordenada sindética aditiva",
+    "mas": "coordenada sindética adversativa",
+    "porem": "coordenada sindética adversativa",
+    "contudo": "coordenada sindética adversativa",
+    "todavia": "coordenada sindética adversativa",
+    "entretanto": "coordenada sindética adversativa",
+    "ou": "coordenada sindética alternativa",
+    "logo": "coordenada sindética conclusiva",
+    "portanto": "coordenada sindética conclusiva",
+    "pois": "coordenada sindética conclusiva ou explicativa",
+}
+
+SUBORDINATING_CONNECTORS = {
+    "porque": "subordinada adverbial causal",
+    "como": "subordinada adverbial causal, comparativa ou conformativa",
+    "quando": "subordinada adverbial temporal",
+    "enquanto": "subordinada adverbial temporal",
+    "embora": "subordinada adverbial concessiva",
+    "conquanto": "subordinada adverbial concessiva",
+    "caso": "subordinada adverbial condicional",
+    "se": "subordinada adverbial condicional ou substantiva integrante",
+    "conforme": "subordinada adverbial conformativa",
+    "consoante": "subordinada adverbial conformativa",
+}
+
+# A regência é registrada apenas quando o uso mais comum é suficientemente
+# estável. Casos polissêmicos continuam marcados como hipóteses.
+VERB_FRAMES = {
+    "amar": {"tipo": "VTD", "preps": set()},
+    "analisar": {"tipo": "VTD", "preps": set()},
+    "aprender": {"tipo": "VTD", "preps": set()},
+    "aprovar": {"tipo": "VTD", "preps": set()},
+    "buscar": {"tipo": "VTD", "preps": set()},
+    "chamar": {"tipo": "VTD", "preps": set()},
+    "comer": {"tipo": "VTD", "preps": set()},
+    "comprar": {"tipo": "VTD", "preps": set()},
+    "compreender": {"tipo": "VTD", "preps": set()},
+    "conhecer": {"tipo": "VTD", "preps": set()},
+    "corrigir": {"tipo": "VTD", "preps": set()},
+    "criar": {"tipo": "VTD", "preps": set()},
+    "encontrar": {"tipo": "VTD", "preps": set()},
+    "entender": {"tipo": "VTD", "preps": set()},
+    "estudar": {"tipo": "VTD ou VI", "preps": set()},
+    "fazer": {"tipo": "VTD ou impessoal", "preps": set()},
+    "ler": {"tipo": "VTD", "preps": set()},
+    "observar": {"tipo": "VTD", "preps": set()},
+    "produzir": {"tipo": "VTD", "preps": set()},
+    "resolver": {"tipo": "VTD", "preps": set()},
+    "usar": {"tipo": "VTD", "preps": set()},
+    "ver": {"tipo": "VTD", "preps": set()},
+    "vender": {"tipo": "VTD", "preps": set()},
+    "alugar": {"tipo": "VTD", "preps": set()},
+    "beber": {"tipo": "VTD", "preps": set()},
+    "ter": {"tipo": "VTD", "preps": set()},
+    "haver": {"tipo": "VTD impessoal", "preps": set()},
+    "considerar": {"tipo": "VTD", "preps": set()},
+    "machucar": {"tipo": "VTD ou pronominal", "preps": set()},
+    "gostar": {"tipo": "VTI", "preps": {"de"}},
+    "confiar": {"tipo": "VTI", "preps": {"em"}},
+    "obedecer": {"tipo": "VTI", "preps": {"a"}},
+    "precisar": {"tipo": "VTI", "preps": {"de"}},
+    "depender": {"tipo": "VTI", "preps": {"de"}},
+    "lembrar": {"tipo": "VTD ou VTI", "preps": {"de"}},
+    "assistir": {"tipo": "VTI ou VTD", "preps": {"a"}},
+    "responder": {"tipo": "VTDI ou VTD", "preps": {"a"}},
+    "perguntar": {"tipo": "VTDI", "preps": {"a", "para"}},
+    "dar": {"tipo": "VTDI", "preps": {"a", "para"}},
+    "dizer": {"tipo": "VTDI", "preps": {"a", "para"}},
+    "entregar": {"tipo": "VTDI", "preps": {"a", "para"}},
+    "enviar": {"tipo": "VTDI", "preps": {"a", "para"}},
+    "explicar": {"tipo": "VTDI", "preps": {"a", "para"}},
+    "mostrar": {"tipo": "VTDI", "preps": {"a", "para"}},
+    "oferecer": {"tipo": "VTDI", "preps": {"a", "para"}},
+    "pedir": {"tipo": "VTDI", "preps": {"a", "para"}},
+    "chegar": {"tipo": "VI", "preps": set(), "locativo": True},
+    "correr": {"tipo": "VI", "preps": set()},
+    "dormir": {"tipo": "VI", "preps": set()},
+    "entrar": {"tipo": "VI", "preps": set(), "locativo": True},
+    "existir": {"tipo": "VI", "preps": set()},
+    "ir": {"tipo": "VI", "preps": set(), "locativo": True},
+    "morar": {"tipo": "VI", "preps": set(), "locativo": True},
+    "nascer": {"tipo": "VI", "preps": set(), "locativo": True},
+    "sair": {"tipo": "VI", "preps": set(), "locativo": True},
+    "viajar": {"tipo": "VI", "preps": set(), "locativo": True},
+    "voltar": {"tipo": "VI", "preps": set(), "locativo": True},
+    "ser": {"tipo": "VL", "preps": set()},
+    "estar": {"tipo": "VL", "preps": set()},
+    "ficar": {"tipo": "VL ou VI", "preps": set(), "locativo": True},
+    "parecer": {"tipo": "VL", "preps": set()},
+    "permanecer": {"tipo": "VL ou VI", "preps": set(), "locativo": True},
+    "continuar": {"tipo": "VL ou auxiliar", "preps": set()},
+}
 
 
 CLASS_DESCRIPTIONS = {
@@ -1093,6 +1469,1632 @@ def _syntactic_analysis(words: list[WordAnalysis]) -> dict:
     }
 
 
+# ---------------------------------------------------------------------------
+# Análise contextual 2.0
+# ---------------------------------------------------------------------------
+
+CLITIC_SUFFIXES = {
+    "me": "me",
+    "te": "te",
+    "se": "se",
+    "nos": "nos",
+    "vos": "vos",
+    "lhe": "lhe",
+    "lhes": "lhes",
+    "o": "o",
+    "a": "a",
+    "os": "os",
+    "as": "as",
+    "lo": "o",
+    "la": "a",
+    "los": "os",
+    "las": "as",
+}
+
+IRREGULAR_PARTICIPLES = {
+    "aberto": "abrir",
+    "aberta": "abrir",
+    "abertos": "abrir",
+    "abertas": "abrir",
+    "coberto": "cobrir",
+    "coberta": "cobrir",
+    "dito": "dizer",
+    "dita": "dizer",
+    "eleito": "eleger",
+    "eleita": "eleger",
+    "entregue": "entregar",
+    "entregues": "entregar",
+    "escrito": "escrever",
+    "escrita": "escrever",
+    "escritos": "escrever",
+    "escritas": "escrever",
+    "feito": "fazer",
+    "feita": "fazer",
+    "feitos": "fazer",
+    "feitas": "fazer",
+    "ganho": "ganhar",
+    "ganha": "ganhar",
+    "morto": "morrer",
+    "morta": "morrer",
+    "pago": "pagar",
+    "paga": "pagar",
+    "posto": "pôr",
+    "posta": "pôr",
+    "preso": "prender",
+    "presa": "prender",
+    "visto": "ver",
+    "vista": "ver",
+}
+
+
+def _tokenize_sentence(sentence: str) -> list[str]:
+    """Tokeniza e separa pronomes enclíticos sem quebrar palavras compostas."""
+    initial = TOKEN_RE.findall(sentence)
+    result: list[str] = []
+    for token in initial:
+        if "-" not in token or not token[:1].isalpha():
+            result.append(token)
+            continue
+        parts = token.split("-")
+        suffix = normalize(parts[-1])
+        base = "-".join(parts[:-1])
+        base_normalized = normalize(base)
+        if (
+            suffix in CLITIC_SUFFIXES
+            and (
+                base_normalized in VERB_FORMS
+                or base_normalized.endswith(("ar", "er", "ir", "ou", "eu", "iu", "am", "em"))
+            )
+        ):
+            result.extend([base, CLITIC_SUFFIXES[suffix]])
+        else:
+            result.append(token)
+    return result
+
+
+def _previous_lexical(words: list[WordAnalysis], index: int) -> int | None:
+    for cursor in range(index - 1, -1, -1):
+        if words[cursor].classe != "pontuação":
+            return cursor
+    return None
+
+
+def _next_lexical(words: list[WordAnalysis], index: int) -> int | None:
+    for cursor in range(index + 1, len(words)):
+        if words[cursor].classe != "pontuação":
+            return cursor
+    return None
+
+
+def _set_analysis(
+    word: WordAnalysis,
+    classe: str,
+    subclasse: str,
+    explicacao: str,
+    confianca: int,
+    morfologia: list[str] | None = None,
+    alternativas: list[str] | None = None,
+) -> None:
+    word.classe = classe
+    word.subclasse = subclasse
+    word.explicacao = explicacao
+    word.confianca = confianca
+    if morfologia is not None:
+        word.morfologia = morfologia
+    if alternativas is not None:
+        word.alternativas = alternativas
+
+
+def _infer_regular_lemma(form: str) -> tuple[str, str] | None:
+    """Infere lemas regulares somente a partir de terminações informativas."""
+    form = normalize(form)
+    patterns = (
+        ("ariamos", "ar", "futuro do pretérito"),
+        ("eriamos", "er", "futuro do pretérito"),
+        ("iriamos", "ir", "futuro do pretérito"),
+        ("assemos", "ar", "pretérito imperfeito do subjuntivo"),
+        ("essemos", "er", "pretérito imperfeito do subjuntivo"),
+        ("issemos", "ir", "pretérito imperfeito do subjuntivo"),
+        ("avam", "ar", "pretérito imperfeito do indicativo"),
+        ("iamos", "er", "pretérito imperfeito do indicativo"),
+        ("aram", "ar", "pretérito perfeito do indicativo"),
+        ("eram", "er", "pretérito perfeito ou imperfeito"),
+        ("iram", "ir", "pretérito perfeito do indicativo"),
+        ("ando", "ar", "gerúndio"),
+        ("endo", "er", "gerúndio"),
+        ("indo", "ir", "gerúndio"),
+        ("ado", "ar", "particípio"),
+        ("ido", "er", "particípio"),
+        ("aria", "ar", "futuro do pretérito"),
+        ("eria", "er", "futuro do pretérito"),
+        ("iria", "ir", "futuro do pretérito"),
+        ("amos", "ar", "presente ou pretérito perfeito"),
+        ("emos", "er", "presente do indicativo"),
+        ("imos", "ir", "presente ou pretérito perfeito"),
+        ("ava", "ar", "pretérito imperfeito do indicativo"),
+        ("iam", "er", "pretérito imperfeito do indicativo"),
+        ("ou", "ar", "pretérito perfeito do indicativo"),
+        ("eu", "er", "pretérito perfeito do indicativo"),
+        ("iu", "ir", "pretérito perfeito do indicativo"),
+        ("ei", "ar", "pretérito perfeito do indicativo"),
+    )
+    for ending, infinitive_ending, tense in patterns:
+        if form.endswith(ending) and len(form) > len(ending) + 2:
+            stem = form[: -len(ending)]
+            return stem + infinitive_ending, tense
+    return None
+
+
+def _verb_features(token: str, lemma: str, morphology: list[str]) -> list[str]:
+    word = normalize(token)
+    result = [item for item in morphology if not item.startswith("tempo provável:")]
+    if any(item in result for item in ("infinitivo", "gerúndio", "particípio")):
+        return result
+
+    first_person_singular = normalized_set(
+        "sou estou tenho vou posso quero faço digo vejo venho ponho sei leio trago "
+        "peço consigo durmo sinto ouço saio caio mantenho devo dou fui vi li"
+    )
+    if word in first_person_singular or (
+        word.endswith("o") and lemma.endswith(("ar", "er", "ir"))
+    ):
+        result.extend(["1ª pessoa", "singular"])
+    elif word.endswith("mos"):
+        result.extend(["1ª pessoa", "plural"])
+    elif word.endswith(("am", "em")) or token.lower().endswith("ão"):
+        result.extend(["3ª pessoa", "plural"])
+    else:
+        result.extend(["3ª pessoa ou forma dependente do contexto", "singular"])
+
+    if word.endswith(("ava", "avas", "avamos", "avam", "ia", "ias", "iamos", "iam")):
+        result.append("tempo provável: pretérito imperfeito do indicativo")
+    elif word.endswith(("ou", "eu", "iu", "aram", "eram", "iram")) or word in {
+        "fui",
+        "foi",
+        "foram",
+        "vi",
+        "li",
+        "fez",
+        "deu",
+        "disse",
+        "veio",
+        "houve",
+    }:
+        result.append("tempo provável: pretérito perfeito do indicativo")
+    elif word.endswith(("aria", "eria", "iria", "ariam", "eriam", "iriam")):
+        result.append("tempo provável: futuro do pretérito")
+    elif token.lower().endswith(("rá", "rão")):
+        result.append("tempo provável: futuro do presente")
+    else:
+        result.append("tempo provável: presente ou forma dependente do contexto")
+    return list(dict.fromkeys(result))
+
+
+def _refine_morphology(words: list[WordAnalysis], sentence: str) -> None:
+    """Segunda passagem: usa vizinhança e estrutura para resolver homônimos."""
+    for index, word in enumerate(words):
+        if word.classe == "pontuação":
+            continue
+        previous_index = _previous_lexical(words, index)
+        next_index = _next_lexical(words, index)
+        previous = words[previous_index] if previous_index is not None else None
+        following = words[next_index] if next_index is not None else None
+        normalized = word.normalized
+
+        if (
+            normalized in PROPER_NOUNS
+            or (
+                word.token[:1].isupper()
+                and index == 0
+                and following
+                and following.classe == "verbo"
+                and normalized not in CONJUNCTIONS
+                and normalized not in ADVERBS
+                and normalized not in PREPOSITIONS
+            )
+            or (
+                word.token[:1].isupper()
+                and previous
+                and previous.token[:1].isupper()
+                and previous.classe in {"substantivo", "adjetivo"}
+            )
+        ) and word.classe in {"substantivo", "adjetivo"}:
+            _set_analysis(
+                word,
+                "substantivo",
+                "próprio",
+                "Nomeia um ser ou lugar individualizado; a maiúscula reforça essa leitura.",
+                94 if normalized in PROPER_NOUNS else 78,
+                ["substantivo próprio"],
+            )
+
+        if normalized in IRREGULAR_PARTICIPLES:
+            lemma = IRREGULAR_PARTICIPLES[normalized]
+            _set_analysis(
+                word,
+                "verbo",
+                f"verbo {lemma}",
+                f"É particípio irregular ou especial do verbo “{lemma}”.",
+                96,
+                [f"forma do verbo {lemma}", "particípio", "forma nominal"],
+            )
+            continue
+
+        if (
+            word.classe != "verbo"
+            and normalized.endswith(("ados", "adas", "idos", "idas"))
+        ):
+            singular = normalized[:-1]
+            known_lemmas = set(REGULAR_VERBS) | EXTRA_REGULAR_VERBS
+            if singular.endswith(("ado", "ada")):
+                candidates = [singular[:-3] + "ar"]
+            else:
+                candidates = [singular[:-3] + "er", singular[:-3] + "ir"]
+            lemma = next((item for item in candidates if item in known_lemmas), "")
+            if lemma:
+                _set_analysis(
+                    word,
+                    "verbo",
+                    f"verbo {lemma} (lema estimado)",
+                    "A terminação e a concordância indicam um particípio flexionado.",
+                    84,
+                    [f"forma provável do verbo {lemma}", "particípio", "forma nominal", "plural"],
+                    ["adjetivo formado de particípio, conforme o contexto"],
+                )
+
+        if normalized in {"como"}:
+            if (
+                previous
+                and previous.normalized in PERSONAL_SUBJECT_PRONOUNS
+                and following
+                and following.classe not in {"verbo", "conjunção"}
+            ):
+                _set_analysis(
+                    word,
+                    "verbo",
+                    "verbo comer",
+                    "Depois de um pronome sujeito e antes de um grupo nominal, “como” indica o ato de comer.",
+                    88,
+                    ["forma do verbo comer", "forma finita", "1ª pessoa", "singular"],
+                    ["conjunção ou advérbio em outro contexto"],
+                )
+            elif sentence.rstrip().endswith("?") and index <= 1:
+                _set_analysis(
+                    word,
+                    "advérbio",
+                    "interrogativo de modo",
+                    "Introduz uma pergunta sobre o modo como algo acontece.",
+                    91,
+                    ["classe invariável"],
+                    ["conjunção em outro contexto"],
+                )
+
+        if normalized == "que":
+            previous_verbs = [
+                item
+                for item in words[:index]
+                if item.classe == "verbo"
+            ]
+            time_construction = bool(
+                previous
+                and previous.normalized in TIME_NOUNS
+                and previous_verbs
+                and _word_lemma(previous_verbs[-1]) in {"fazer", "haver"}
+            )
+            if time_construction:
+                _set_analysis(
+                    word,
+                    "conjunção",
+                    "subordinativa temporal",
+                    "Depois de uma expressão de tempo, introduz a oração que marca sua duração.",
+                    83,
+                    ["classe invariável"],
+                    ["pronome relativo ou conjunção integrante em outro contexto"],
+                )
+            elif previous and previous.classe == "substantivo" and following:
+                _set_analysis(
+                    word,
+                    "pronome",
+                    "relativo",
+                    "Retoma o substantivo anterior e introduz uma oração que o caracteriza.",
+                    88,
+                    ["classe invariável nesta forma"],
+                    ["conjunção integrante em outro contexto"],
+                )
+            elif sentence.rstrip().endswith("?") and index == 0:
+                _set_analysis(
+                    word,
+                    "pronome",
+                    "interrogativo",
+                    "Introduz uma pergunta e determina ou substitui um nome.",
+                    87,
+                    ["pronome interrogativo"],
+                    ["conjunção em outro contexto"],
+                )
+
+        if normalized == "onde":
+            if previous and (
+                previous.normalized in PLACE_NOUNS
+                or previous.classe == "substantivo"
+            ):
+                word.subclasse = "relativo locativo"
+                word.explicacao = "Retoma um lugar mencionado anteriormente."
+                word.confianca = 84
+            elif sentence.rstrip().endswith("?"):
+                _set_analysis(
+                    word,
+                    "advérbio",
+                    "interrogativo de lugar",
+                    "Pergunta pelo lugar relacionado à ação.",
+                    91,
+                    ["classe invariável"],
+                    ["pronome relativo quando retoma um lugar"],
+                )
+
+        if normalized == "se":
+            previous_is_verb = bool(previous and previous.classe == "verbo")
+            next_is_verb = bool(following and following.classe == "verbo")
+            begins_clause = previous is None or (
+                previous_index is not None
+                and any(
+                    words[cursor].token in {",", ";", ".", "!", "?"}
+                    for cursor in range(max(0, previous_index), index)
+                )
+            )
+            if previous_is_verb or (
+                next_is_verb
+                and previous
+                and previous.classe in {"pronome", "advérbio", "substantivo"}
+            ):
+                _set_analysis(
+                    word,
+                    "pronome",
+                    "partícula pronominal",
+                    "Liga-se ao verbo; a sintaxe decidirá se é reflexivo, apassivador ou índice de indeterminação.",
+                    78,
+                    ["classe invariável nesta forma"],
+                    ["conjunção condicional ou integrante"],
+                )
+            elif begins_clause and next_is_verb:
+                word.classe = "conjunção"
+                word.subclasse = "condicional ou integrante"
+                word.explicacao = "Introduz uma oração; o verbo anterior e o sentido definem se há condição ou integração."
+                word.confianca = 78
+
+        if normalized in {"o", "a", "os", "as"} and word.classe == "artigo":
+            if following and following.classe == "verbo":
+                previous_lemma = (
+                    previous.subclasse.replace("verbo ", "").split("/")[0]
+                    if previous and previous.classe == "verbo"
+                    else ""
+                )
+                if "infinitivo" in following.morfologia or previous_lemma in {
+                    "começar",
+                    "continuar",
+                    "voltar",
+                }:
+                    _set_analysis(
+                        word,
+                        "preposição",
+                        "essencial",
+                        "Liga a forma verbal anterior ao infinitivo.",
+                        90,
+                        ["classe invariável"],
+                        ["artigo ou pronome em outro contexto"],
+                    )
+                elif previous:
+                    _set_analysis(
+                        word,
+                        "pronome",
+                        "pessoal oblíquo átono",
+                        "Substitui um complemento verbal já conhecido no contexto.",
+                        86,
+                        ["pronome pessoal", "forma átona"],
+                        ["artigo definido em outro contexto"],
+                    )
+
+        if normalized in {"um", "uma"} and word.classe == "artigo":
+            if previous and previous.normalized in {"so", "somente", "apenas", "exatamente"}:
+                _set_analysis(
+                    word,
+                    "numeral",
+                    "cardinal",
+                    "A palavra de foco anterior destaca a quantidade exata.",
+                    90,
+                    ["cardinal", "classe variável em gênero"],
+                    ["artigo indefinido em outro contexto"],
+                )
+
+        if normalized == "meio":
+            if following and following.classe == "adjetivo":
+                _set_analysis(
+                    word,
+                    "advérbio",
+                    "intensidade",
+                    "Equivale a “um pouco” e modifica o adjetivo seguinte.",
+                    93,
+                    ["classe invariável"],
+                    ["numeral fracionário ou substantivo"],
+                )
+            elif following and following.classe == "substantivo":
+                word.classe = "numeral"
+                word.subclasse = "fracionário"
+                word.explicacao = "Indica metade da quantidade expressa pelo nome."
+                word.confianca = 91
+
+        if normalized in {"muito", "pouco", "bastante", "tanto"}:
+            if following and following.classe == "substantivo":
+                _set_analysis(
+                    word,
+                    "pronome",
+                    "indefinido adjetivo",
+                    "Acompanha o substantivo e indica quantidade imprecisa.",
+                    88,
+                    ["classe variável conforme o contexto"],
+                    ["advérbio quando modifica verbo, adjetivo ou advérbio"],
+                )
+
+        if normalized in {
+            "muitos",
+            "muitas",
+            "poucos",
+            "poucas",
+            "bastantes",
+            "tantos",
+            "tantas",
+            "todos",
+            "todas",
+            "alguns",
+            "algumas",
+            "varios",
+            "varias",
+        } and following and following.classe in {"artigo", "substantivo", "adjetivo"}:
+            _set_analysis(
+                word,
+                "pronome",
+                "indefinido adjetivo",
+                "Acompanha um grupo nominal e indica totalidade ou quantidade não exata.",
+                89,
+                ["classe variável"],
+                ["advérbio ou numeral em usos específicos"],
+            )
+
+        if normalized == "so":
+            if following and following.classe == "substantivo":
+                _set_analysis(
+                    word,
+                    "adjetivo",
+                    "qualificativo",
+                    "Caracteriza o nome com sentido de único ou desacompanhado.",
+                    78,
+                    ["classe variável"],
+                    ["advérbio com sentido de somente"],
+                )
+            else:
+                _set_analysis(
+                    word,
+                    "advérbio",
+                    "exclusão",
+                    "Equivale a “somente” no contexto.",
+                    82,
+                    ["classe invariável"],
+                    ["adjetivo em outro contexto"],
+                )
+
+        if (
+            word.classe == "substantivo"
+            and word.confianca <= 60
+            and previous
+            and (
+                previous.normalized in PERSONAL_SUBJECT_PRONOUNS
+                or previous.classe in {"substantivo", "pronome", "advérbio"}
+            )
+        ):
+            inference = _infer_regular_lemma(normalized)
+            if inference:
+                lemma, tense = inference
+                _set_analysis(
+                    word,
+                    "verbo",
+                    f"verbo {lemma} (lema estimado)",
+                    f"A terminação e a posição na frase sugerem uma forma do verbo “{lemma}”.",
+                    69,
+                    [f"forma provável do verbo {lemma}", "forma finita", f"tempo provável: {tense}"],
+                    ["substantivo ou adjetivo em outro contexto"],
+                )
+
+        if (
+            word.classe == "substantivo"
+            and word.confianca <= 60
+            and normalized.endswith(("ando", "endo", "indo"))
+        ):
+            inference = _infer_regular_lemma(normalized)
+            if inference:
+                lemma, _ = inference
+                _set_analysis(
+                    word,
+                    "verbo",
+                    f"verbo {lemma} (lema estimado)",
+                    "A terminação -ndo indica uma forma verbal no gerúndio.",
+                    82,
+                    [f"forma provável do verbo {lemma}", "gerúndio", "forma nominal"],
+                )
+
+        if (
+            word.classe == "substantivo"
+            and word.confianca <= 60
+            and word.token[:1].isupper()
+            and (
+                index == 0
+                or (previous and previous.token in {".", "!", "?"})
+                or (following and following.classe in {"verbo", "substantivo"})
+            )
+        ):
+            word.subclasse = "próprio (hipótese contextual)"
+            word.explicacao = "A inicial maiúscula e a posição sugerem um nome próprio."
+            word.confianca = 72
+
+    # Flexões verbais são acrescentadas depois das correções contextuais.
+    for word in words:
+        if word.classe != "verbo":
+            continue
+        lemma = word.subclasse.replace("verbo ", "").split(" ")[0].split("/")[0]
+        word.morfologia = _verb_features(word.token, lemma, word.morfologia)
+
+
+@dataclass
+class VerbGroup:
+    indices: list[int]
+    finite_index: int
+    head_index: int
+    lemma: str
+    auxiliary_lemmas: list[str] = field(default_factory=list)
+
+    @property
+    def start(self) -> int:
+        return min(self.indices)
+
+    @property
+    def end(self) -> int:
+        return max(self.indices)
+
+
+@dataclass
+class ClauseSpan:
+    indices: list[int]
+    verb_group: VerbGroup
+    connector_index: int | None = None
+    tipo: str = ""
+
+
+def _word_lemma(word: WordAnalysis) -> str:
+    if word.classe != "verbo":
+        return ""
+    text = word.subclasse.replace("verbo ", "")
+    return normalize(text.split(" ")[0].split("/")[0])
+
+
+def _is_nominal_verb(word: WordAnalysis) -> bool:
+    return any(
+        item in word.morfologia for item in ("infinitivo", "gerúndio", "particípio")
+    )
+
+
+def _build_verb_groups(words: list[WordAnalysis]) -> list[VerbGroup]:
+    verb_indices = [index for index, word in enumerate(words) if word.classe == "verbo"]
+    groups: list[VerbGroup] = []
+    used: set[int] = set()
+
+    for position, index in enumerate(verb_indices):
+        if index in used:
+            continue
+        word = words[index]
+        lemma = _word_lemma(word)
+        indices = [index]
+        auxiliaries: list[str] = []
+        head = index
+        if not _is_nominal_verb(word) and lemma in AUXILIARY_VERBS:
+            for candidate in verb_indices[position + 1 :]:
+                if candidate - index > 5 or candidate in used:
+                    break
+                between = words[index + 1 : candidate]
+                if any(
+                    item.classe not in {"advérbio", "preposição", "pronome"}
+                    for item in between
+                ):
+                    break
+                if _is_nominal_verb(words[candidate]):
+                    indices.append(candidate)
+                    auxiliaries.append(lemma)
+                    head = candidate
+                    used.add(candidate)
+                    break
+        used.add(index)
+        head_lemma = _word_lemma(words[head]) or lemma
+        groups.append(
+            VerbGroup(
+                indices=indices,
+                finite_index=index,
+                head_index=head,
+                lemma=head_lemma,
+                auxiliary_lemmas=auxiliaries,
+            )
+        )
+
+    for group in groups:
+        if len(group.indices) > 1:
+            for index in group.indices[:-1]:
+                words[index].funcao = "verbo auxiliar da locução verbal"
+            for index in range(group.indices[0] + 1, group.head_index):
+                if words[index].classe == "preposição":
+                    words[index].funcao = "elemento de ligação da locução verbal"
+                elif words[index].classe == "pronome":
+                    words[index].funcao = "pronome ligado à locução verbal"
+            words[group.head_index].funcao = "núcleo verbal da locução"
+        else:
+            words[group.head_index].funcao = "núcleo do predicado"
+    return groups
+
+
+def _clause_connector(words: list[WordAnalysis], indices: list[int]) -> int | None:
+    for position, index in enumerate(indices):
+        word = words[index]
+        if word.classe in {"pontuação", "advérbio"}:
+            continue
+        if word.classe == "conjunção" or (
+            word.classe == "pronome" and "relativo" in word.subclasse
+        ):
+            return index
+        break
+    return None
+
+
+def _build_clause_spans(
+    words: list[WordAnalysis], groups: list[VerbGroup]
+) -> list[ClauseSpan]:
+    if not groups:
+        return []
+    starts: list[int] = [0]
+    for previous, current in zip(groups, groups[1:]):
+        between = list(range(previous.end + 1, current.start))
+        connectors = [
+            index
+            for index in between
+            if words[index].classe == "conjunção"
+            or (words[index].classe == "pronome" and "relativo" in words[index].subclasse)
+        ]
+        punctuation = [
+            index for index in between if words[index].token in {",", ";", ":"}
+        ]
+        if connectors:
+            starts.append(connectors[-1])
+        elif punctuation:
+            starts.append(punctuation[-1] + 1)
+        else:
+            starts.append(current.start)
+
+    # Um relativo pode aparecer antes do primeiro verbo: "O livro que comprei chegou".
+    first_group = groups[0]
+    relative_before = [
+        index
+        for index in range(0, first_group.start)
+        if words[index].classe == "pronome" and "relativo" in words[index].subclasse
+    ]
+    detached_prefix: list[int] = []
+    if relative_before and len(groups) > 1:
+        starts[0] = relative_before[-1]
+        detached_prefix = list(range(0, starts[0]))
+
+    spans: list[ClauseSpan] = []
+    for position, group in enumerate(groups):
+        start = starts[position]
+        end = starts[position + 1] if position + 1 < len(starts) else len(words)
+        indices = list(range(start, end))
+        spans.append(
+            ClauseSpan(
+                indices=indices,
+                verb_group=group,
+                connector_index=_clause_connector(words, indices),
+            )
+        )
+
+    if detached_prefix:
+        # O antecedente do relativo pertence à oração principal, normalmente
+        # organizada pelo último grupo verbal.
+        spans[-1].indices = detached_prefix + spans[-1].indices
+    return spans
+
+
+def _classify_clauses(words: list[WordAnalysis], spans: list[ClauseSpan]) -> None:
+    subordinate_found = False
+    for position, span in enumerate(spans):
+        connector = words[span.connector_index] if span.connector_index is not None else None
+        connector_word = connector.normalized if connector else ""
+        if connector and connector.classe == "pronome" and "relativo" in connector.subclasse:
+            left_comma = span.connector_index > 0 and words[span.connector_index - 1].token == ","
+            span.tipo = (
+                "oração subordinada adjetiva explicativa"
+                if left_comma
+                else "oração subordinada adjetiva restritiva"
+            )
+            subordinate_found = True
+        elif connector_word in COORDINATING_CONNECTORS:
+            span.tipo = "oração " + COORDINATING_CONNECTORS[connector_word]
+        elif connector_word == "que":
+            previous_group = spans[position - 1].verb_group if position > 0 else None
+            if connector and "temporal" in connector.subclasse:
+                span.tipo = "oração subordinada adverbial temporal"
+            elif previous_group and previous_group.lemma in SPEECH_COGNITION_VERBS:
+                span.tipo = "oração subordinada substantiva objetiva direta"
+            else:
+                span.tipo = "oração subordinada substantiva (hipótese)"
+            subordinate_found = True
+        elif connector_word == "se":
+            previous_group = spans[position - 1].verb_group if position > 0 else None
+            if previous_group and previous_group.lemma in SPEECH_COGNITION_VERBS:
+                span.tipo = "oração subordinada substantiva objetiva direta"
+            else:
+                span.tipo = "oração subordinada adverbial condicional"
+            subordinate_found = True
+        elif connector_word in SUBORDINATING_CONNECTORS:
+            span.tipo = "oração " + SUBORDINATING_CONNECTORS[connector_word]
+            subordinate_found = True
+        elif position > 0:
+            span.tipo = "oração coordenada assindética ou justaposta"
+
+    if len(spans) == 1:
+        spans[0].tipo = spans[0].tipo or "oração absoluta (período simples)"
+    else:
+        for position, span in enumerate(spans):
+            if span.tipo:
+                continue
+            if subordinate_found:
+                span.tipo = "oração principal"
+            elif position == 0:
+                span.tipo = "oração coordenada assindética inicial"
+            else:
+                span.tipo = "oração coordenada assindética"
+
+        if subordinate_found:
+            # Em "Quando cheguei, ela saiu" ou "O livro que comprei chegou",
+            # a oração sem conector próprio é a principal, ainda que venha depois.
+            candidates = [
+                span
+                for span in spans
+                if span.connector_index is None
+                and (
+                    not span.tipo
+                    or "assindética" in span.tipo
+                    or "justaposta" in span.tipo
+                )
+            ]
+            if candidates:
+                candidates[-1].tipo = "oração principal"
+
+    for span in spans:
+        if span.connector_index is not None:
+            connector = words[span.connector_index]
+            connector.funcao = "conector da " + span.tipo.replace("oração ", "")
+
+
+def _nominal_groups(
+    words: list[WordAnalysis], indices: list[int]
+) -> list[dict]:
+    groups: list[dict] = []
+    current: list[int] = []
+    prepositional = False
+    prep = ""
+
+    def flush() -> None:
+        nonlocal current, prepositional, prep
+        if current and any(
+            words[index].classe in {"substantivo", "pronome", "numeral", "adjetivo"}
+            for index in current
+        ):
+            groups.append(
+                {
+                    "indices": current[:],
+                    "prepositional": prepositional,
+                    "prep": prep,
+                }
+            )
+        current = []
+        prepositional = False
+        prep = ""
+
+    for position, index in enumerate(indices):
+        word = words[index]
+        if word.classe == "pontuação" or word.classe == "verbo":
+            flush()
+            continue
+        if word.classe == "advérbio" or word.classe == "interjeição":
+            flush()
+            continue
+        if word.classe == "conjunção":
+            flush()
+            continue
+        if word.classe == "preposição":
+            next_index = indices[position + 1] if position + 1 < len(indices) else None
+            if (
+                current
+                and prepositional
+                and words[current[-1]].token[:1].isupper()
+                and next_index is not None
+                and words[next_index].token[:1].isupper()
+            ):
+                current.append(index)
+                continue
+            flush()
+            current = [index]
+            prepositional = True
+            prep = word.normalized
+            continue
+        if word.normalized in {"me", "te", "se", "lhe", "lhes", "nos", "vos", "o", "a", "os", "as"} and (
+            "oblíquo" in word.subclasse or "partícula" in word.subclasse
+        ):
+            flush()
+            continue
+        if (
+            current
+            and not prepositional
+            and words[current[-1]].classe == "substantivo"
+            and word.classe in {"artigo", "pronome"}
+        ):
+            flush()
+        current.append(index)
+    flush()
+    return groups
+
+
+def _group_text(words: list[WordAnalysis], indices: list[int]) -> str:
+    return _join_tokens(words[index].token for index in indices)
+
+
+def _mark_group(
+    words: list[WordAnalysis],
+    indices: list[int],
+    head_function: str,
+) -> None:
+    candidates = [
+        index
+        for index in indices
+        if words[index].classe in {"substantivo", "pronome", "numeral"}
+        and words[index].normalized not in {"me", "te", "se", "lhe", "lhes"}
+    ]
+    if not candidates:
+        candidates = [index for index in indices if words[index].classe == "adjetivo"]
+    if not candidates:
+        return
+    head = candidates[-1]
+    words[head].funcao = head_function
+    for index in indices:
+        if index == head:
+            continue
+        if words[index].classe in {"artigo", "adjetivo", "pronome", "numeral"}:
+            words[index].funcao = "adjunto adnominal"
+
+
+def _subject_hint(word: WordAnalysis) -> str:
+    normalized = word.normalized
+    if "1ª pessoa" in word.morfologia and "singular" in word.morfologia:
+        return "eu"
+    if "1ª pessoa" in word.morfologia and "plural" in word.morfologia:
+        return "nós"
+    if normalized in normalized_set(
+        "sou estou tenho vou posso quero faço digo vejo venho sei leio trago peço dou fui vi li"
+    ):
+        return "eu"
+    if normalized.endswith("mos"):
+        return "nós"
+    lemma = _word_lemma(word)
+    if normalized.endswith("ei") or (
+        normalized.endswith("i") and lemma.endswith(("er", "ir"))
+    ):
+        return "eu"
+    return "recuperável pela flexão verbal ou pelo contexto"
+
+
+def _preposition_value(
+    prep: str,
+    group_indices: list[int],
+    words: list[WordAnalysis],
+    lemma: str,
+) -> str:
+    nouns = {words[index].normalized for index in group_indices}
+    if nouns & TIME_NOUNS:
+        return "tempo"
+    if prep in {"em", "no", "na", "nos", "nas", "a", "ao", "para", "ate"} and (
+        lemma in LOCATIVE_VERBS or nouns & PLACE_NOUNS
+    ):
+        return "lugar"
+    if prep in {"com"}:
+        return "companhia, instrumento ou modo"
+    if prep in {"sem"}:
+        return "modo ou ausência"
+    if prep in {"por", "pelo", "pela"}:
+        return "causa, meio ou percurso"
+    if prep in {"de", "do", "da"} and lemma in {"sair", "vir", "voltar"}:
+        return "origem"
+    return "circunstância"
+
+
+def _is_impersonal_use(
+    words: list[WordAnalysis], span: ClauseSpan, lemma: str
+) -> tuple[bool, str]:
+    if lemma == "haver" and not span.verb_group.auxiliary_lemmas:
+        return True, "haver com sentido de existir"
+    if lemma in IMPERSONAL_WEATHER_VERBS:
+        return True, "verbo que indica fenômeno da natureza"
+    after = [
+        words[index].normalized
+        for index in span.indices
+        if index > span.verb_group.end and words[index].classe != "pontuação"
+    ]
+    if lemma == "fazer" and any(item in TIME_NOUNS or item in {"frio", "calor"} for item in after):
+        return True, "fazer indicando tempo decorrido ou fenômeno meteorológico"
+    if lemma == "ser" and any(item in {"hora", "horas", "dia", "dias"} for item in after):
+        return True, "ser indicando hora ou data"
+    return False, ""
+
+
+def _voice_and_se(
+    words: list[WordAnalysis],
+    span: ClauseSpan,
+    frame: dict,
+    after_groups: list[dict],
+) -> tuple[str, str]:
+    group = span.verb_group
+    if (
+        group.auxiliary_lemmas
+        and "ser" in group.auxiliary_lemmas
+        and "particípio" in words[group.head_index].morfologia
+    ):
+        return "voz passiva analítica", ""
+
+    se_indices = [
+        index
+        for index in span.indices
+        if words[index].normalized == "se"
+        and words[index].classe == "pronome"
+        and abs(index - group.finite_index) <= 2
+    ]
+    if not se_indices:
+        return "voz ativa ou não marcada", ""
+    se_index = se_indices[0]
+    frame_type = frame.get("tipo", "")
+    has_post_nominal = any(not item["prepositional"] for item in after_groups)
+    if ("VTD" in frame_type or "VTDI" in frame_type) and has_post_nominal:
+        words[se_index].funcao = "partícula apassivadora"
+        words[se_index].subclasse = "pronome apassivador"
+        words[se_index].confianca = max(words[se_index].confianca, 86)
+        return "voz passiva sintética", "apassivador"
+    if "VTI" in frame_type or frame_type.startswith(("VI", "VL")):
+        words[se_index].funcao = "índice de indeterminação do sujeito"
+        words[se_index].subclasse = "índice de indeterminação"
+        words[se_index].confianca = max(words[se_index].confianca, 86)
+        return "voz ativa com sujeito indeterminado", "indeterminador"
+    words[se_index].funcao = "pronome reflexivo ou parte integrante do verbo (hipótese)"
+    return "voz reflexiva ou pronominal (hipótese)", "reflexivo"
+
+
+def _analyze_clause(
+    words: list[WordAnalysis],
+    span: ClauseSpan,
+    warnings: list[str],
+) -> dict:
+    group = span.verb_group
+    lemma = group.lemma
+    frame = VERB_FRAMES.get(lemma, {"tipo": "regência não cadastrada", "preps": set()})
+    clause_indices = [
+        index for index in span.indices if words[index].classe != "pontuação"
+    ]
+    before = [index for index in span.indices if index < group.finite_index]
+    after = [index for index in span.indices if index > group.end]
+    if span.connector_index in before:
+        before.remove(span.connector_index)
+
+    before_groups = _nominal_groups(words, before)
+    after_groups = _nominal_groups(words, after)
+    explicit_candidates = [
+        item
+        for item in before_groups
+        if not item["prepositional"]
+        and any(
+            words[index].classe in {"substantivo", "pronome", "numeral", "adjetivo"}
+            for index in item["indices"]
+        )
+    ]
+    structural_terms: list[dict] = []
+    comma_positions = [
+        index
+        for index in span.indices
+        if index < group.finite_index and words[index].token == ","
+    ]
+    appositive_groups: list[dict] = []
+    if len(comma_positions) >= 2:
+        appositive_groups = [
+            item
+            for item in explicit_candidates
+            if min(item["indices"]) > comma_positions[0]
+            and max(item["indices"]) < comma_positions[1]
+        ]
+        for item in appositive_groups:
+            _mark_group(words, item["indices"], "núcleo do aposto")
+            structural_terms.append(
+                {"tipo": "aposto explicativo", "texto": _group_text(words, item["indices"])}
+            )
+        explicit_candidates = [
+            item for item in explicit_candidates if item not in appositive_groups
+        ]
+
+    vocative_groups: list[dict] = []
+    if comma_positions and words[group.finite_index].normalized in IMPERATIVE_FORMS:
+        vocative_groups = [
+            item
+            for item in explicit_candidates
+            if max(item["indices"]) < comma_positions[0]
+        ]
+        for item in vocative_groups:
+            _mark_group(words, item["indices"], "núcleo do vocativo")
+            structural_terms.append(
+                {"tipo": "vocativo", "texto": _group_text(words, item["indices"])}
+            )
+        explicit_candidates = [
+            item for item in explicit_candidates if item not in vocative_groups
+        ]
+
+    impersonal, impersonal_reason = _is_impersonal_use(words, span, lemma)
+    voice, se_role = _voice_and_se(words, span, frame, after_groups)
+    subject_groups: list[dict] = []
+    subject_connector_indices: set[int] = set()
+    subject_modifier_indices: set[int] = set()
+    subject_text = ""
+    subject_type = ""
+
+    if impersonal:
+        subject_text = "oração sem sujeito"
+        subject_type = "inexistente"
+    elif se_role == "indeterminador":
+        subject_text = "sujeito indeterminado"
+        subject_type = "indeterminado"
+    elif explicit_candidates:
+        # O grupo mais próximo do verbo tende a ser o sujeito. Grupos ligados
+        # por "e" antes do verbo são reunidos como sujeito composto.
+        subject_groups = [explicit_candidates[-1]]
+        if len(explicit_candidates) >= 2:
+            first = explicit_candidates[-2]
+            between_start = max(first["indices"]) + 1
+            between_end = min(subject_groups[0]["indices"])
+            if any(
+                words[index].normalized == "e"
+                for index in range(between_start, between_end)
+            ):
+                subject_groups.insert(0, first)
+        combined_indices = [
+            index for item in subject_groups for index in item["indices"]
+        ]
+        if len(subject_groups) > 1:
+            connectors = [
+                index
+                for index in before
+                if min(combined_indices) < index < max(combined_indices)
+                and words[index].normalized == "e"
+            ]
+            combined_indices.extend(connectors)
+            subject_connector_indices.update(connectors)
+            for connector_index in connectors:
+                words[connector_index].funcao = "conector de núcleos do sujeito composto"
+            combined_indices.sort()
+        last_subject_index = max(combined_indices)
+        next_comma = next(
+            (
+                comma
+                for comma in comma_positions
+                if comma > last_subject_index
+            ),
+            group.finite_index,
+        )
+        modifier_groups = [
+            item
+            for item in before_groups
+            if item["prepositional"]
+            and min(item["indices"]) > last_subject_index
+            and max(item["indices"]) < next_comma
+        ]
+        subject_heads = {
+            words[index].normalized
+            for item in subject_groups
+            for index in item["indices"]
+            if words[index].classe == "substantivo"
+        }
+        subject_has_proper_name = any(
+            words[index].subclasse == "próprio"
+            or (
+                words[index].classe == "substantivo"
+                and words[index].token[:1].isupper()
+            )
+            for item in subject_groups
+            for index in item["indices"]
+        )
+        for modifier in modifier_groups:
+            subject_modifier_indices.update(modifier["indices"])
+            proper_name_continuation = (
+                subject_has_proper_name
+                and all(
+                    words[index].classe == "preposição"
+                    or words[index].token[:1].isupper()
+                    for index in modifier["indices"]
+                )
+            )
+            if proper_name_continuation:
+                words[modifier["indices"][0]].funcao = (
+                    "elemento de ligação interno do nome próprio"
+                )
+                _mark_group(
+                    words,
+                    modifier["indices"],
+                    "continuação do núcleo do sujeito (nome próprio)",
+                )
+                combined_indices.extend(modifier["indices"])
+                continue
+            modifier_type = (
+                "complemento nominal"
+                if subject_heads & ABSTRACT_NOUNS
+                else "adjunto adnominal preposicionado"
+            )
+            words[modifier["indices"][0]].funcao = f"preposição introdutora do {modifier_type}"
+            _mark_group(words, modifier["indices"], f"núcleo do {modifier_type}")
+            structural_terms.append(
+                {
+                    "tipo": modifier_type,
+                    "texto": _group_text(words, modifier["indices"]),
+                }
+            )
+            combined_indices.extend(modifier["indices"])
+        combined_indices.sort()
+        subject_text = _group_text(words, combined_indices)
+        subject_type = "composto" if len(subject_groups) > 1 else "simples"
+        for item in subject_groups:
+            _mark_group(words, item["indices"], "núcleo do sujeito")
+    else:
+        post_nominal = next(
+            (item for item in after_groups if not item["prepositional"]),
+            None,
+        )
+        if post_nominal and (
+            voice == "voz passiva sintética"
+            or frame.get("tipo", "").startswith("VI")
+            or lemma in {"existir", "acontecer", "ocorrer", "nascer", "chegar"}
+        ):
+            subject_groups = [post_nominal]
+            subject_text = _group_text(words, post_nominal["indices"])
+            subject_type = (
+                "simples paciente posposto"
+                if voice == "voz passiva sintética"
+                else "simples posposto"
+            )
+            _mark_group(words, post_nominal["indices"], "núcleo do sujeito")
+        else:
+            hint = _subject_hint(words[group.finite_index])
+            subject_text = f"oculto ({hint})"
+            subject_type = "oculto ou elíptico"
+
+    excluded = {
+        index for item in subject_groups for index in item["indices"]
+    } | subject_connector_indices | subject_modifier_indices | {
+        index for item in vocative_groups + appositive_groups for index in item["indices"]
+    }
+    complement_groups = [
+        item
+        for item in after_groups
+        if not any(index in excluded for index in item["indices"])
+    ]
+
+    terms: list[dict] = structural_terms[:]
+    complements: list[dict] = []
+    has_predicative = False
+    predicative_indices: set[int] = set()
+    direct_used = False
+    indirect_used = False
+    is_linking = frame.get("tipo", "").startswith("VL") and not group.auxiliary_lemmas
+
+    if is_linking:
+        predicative = next(
+            (
+                item
+                for item in complement_groups
+                if not item["prepositional"]
+                and any(
+                    words[index].classe in {"adjetivo", "substantivo", "pronome", "numeral"}
+                    for index in item["indices"]
+                )
+            ),
+            None,
+        )
+        if predicative:
+            has_predicative = True
+            predicative_indices.update(predicative["indices"])
+            _mark_group(
+                words,
+                predicative["indices"],
+                "núcleo do predicativo do sujeito",
+            )
+            terms.append(
+                {
+                    "tipo": "predicativo do sujeito",
+                    "texto": _group_text(words, predicative["indices"]),
+                }
+            )
+    elif lemma in ACTION_WITH_SUBJECT_PREDICATIVE:
+        predicative = next(
+            (
+                item
+                for item in complement_groups
+                if not item["prepositional"]
+                and any(words[index].classe == "adjetivo" for index in item["indices"])
+            ),
+            None,
+        )
+        if predicative:
+            has_predicative = True
+            predicative_indices.update(predicative["indices"])
+            _mark_group(
+                words,
+                predicative["indices"],
+                "núcleo do predicativo do sujeito",
+            )
+            terms.append(
+                {
+                    "tipo": "predicativo do sujeito",
+                    "texto": _group_text(words, predicative["indices"]),
+                }
+            )
+
+    clitic_indices = [
+        index
+        for index in clause_indices
+        if words[index].classe == "pronome"
+        and "oblíquo" in words[index].subclasse
+        and abs(index - group.finite_index) <= 2
+    ]
+    for clitic_index in clitic_indices:
+        clitic = words[clitic_index]
+        if clitic.normalized in {"o", "a", "os", "as"}:
+            clitic.funcao = "objeto direto"
+            terms.append({"tipo": "objeto direto pronominal", "texto": clitic.token})
+            complements.append({"tipo": "objeto direto", "texto": clitic.token})
+            direct_used = True
+        elif clitic.normalized in {"lhe", "lhes"}:
+            clitic.funcao = "objeto indireto"
+            terms.append({"tipo": "objeto indireto pronominal", "texto": clitic.token})
+            complements.append({"tipo": "objeto indireto", "texto": clitic.token})
+            indirect_used = True
+        elif clitic.normalized not in {"se"}:
+            clitic.funcao = "objeto direto, indireto ou reflexivo (conforme a regência)"
+            terms.append(
+                {
+                    "tipo": "complemento pronominal (verificar regência)",
+                    "texto": clitic.token,
+                }
+            )
+
+    object_predicative_candidates: set[int] = set()
+    last_nonprepositional_nouns: set[str] = set()
+    for item in complement_groups:
+        indices = item["indices"][:]
+        if lemma in OBJECT_PREDICATIVE_VERBS and not item["prepositional"]:
+            trailing_adjectives = [
+                index
+                for index in indices
+                if words[index].classe == "adjetivo"
+                and any(
+                    words[earlier].classe == "substantivo"
+                    for earlier in indices
+                    if earlier < index
+                )
+            ]
+            if trailing_adjectives:
+                object_predicative_candidates.update(trailing_adjectives)
+                indices = [
+                    index for index in indices if index not in object_predicative_candidates
+                ]
+        if any(index in predicative_indices for index in indices):
+            continue
+        text = _group_text(words, indices)
+        if item["prepositional"]:
+            prep = item["prep"]
+            prep_base = {
+                "ao": "a",
+                "aos": "a",
+                "do": "de",
+                "da": "de",
+                "dos": "de",
+                "das": "de",
+                "no": "em",
+                "na": "em",
+                "nos": "em",
+                "nas": "em",
+                "pelo": "por",
+                "pela": "por",
+            }.get(prep, prep)
+            if voice == "voz passiva analítica" and prep_base in {"por", "de"}:
+                term_type = "agente da passiva"
+                words[indices[0]].funcao = "preposição introdutora do agente da passiva"
+                _mark_group(words, indices, "núcleo do agente da passiva")
+            elif prep_base in frame.get("preps", set()):
+                term_type = "objeto indireto"
+                indirect_used = True
+                words[indices[0]].funcao = "preposição exigida pela regência verbal"
+                _mark_group(words, indices, "núcleo do objeto indireto")
+                complements.append({"tipo": term_type, "texto": text})
+            elif (
+                direct_used
+                and prep_base == "de"
+                and last_nonprepositional_nouns
+            ):
+                term_type = (
+                    "complemento nominal"
+                    if last_nonprepositional_nouns & ABSTRACT_NOUNS
+                    else "adjunto adnominal preposicionado"
+                )
+                words[indices[0]].funcao = f"preposição introdutora do {term_type}"
+                _mark_group(words, indices, f"núcleo do {term_type}")
+            else:
+                value = _preposition_value(prep, indices, words, lemma)
+                term_type = f"adjunto adverbial de {value}"
+                words[indices[0]].funcao = "preposição introdutora do adjunto adverbial"
+                _mark_group(words, indices, f"núcleo do {term_type}")
+            terms.append({"tipo": term_type, "texto": text})
+            continue
+
+        frame_type = frame.get("tipo", "")
+        normalized_group = {words[index].normalized for index in indices}
+        if normalized_group & TIME_NOUNS and direct_used:
+            term_type = "adjunto adverbial de tempo"
+            _mark_group(words, indices, "núcleo do adjunto adverbial de tempo")
+        elif "VTD" in frame_type and not direct_used:
+            term_type = "objeto direto"
+            direct_used = True
+            _mark_group(words, indices, "núcleo do objeto direto")
+            complements.append({"tipo": term_type, "texto": text})
+        elif frame_type.startswith("VI"):
+            # Um nome depois de verbo intransitivo costuma ser sujeito posposto;
+            # se já existe sujeito, mantemos a dúvida explícita.
+            term_type = "termo nominal pós-verbal (verificar contexto)"
+            _mark_group(words, indices, "função sintática dependente do contexto")
+            warnings.append(
+                f"Em “{text}”, o termo posterior ao verbo intransitivo “{lemma}” precisa de confirmação contextual."
+            )
+        elif frame_type.startswith("VL"):
+            term_type = "predicativo do sujeito (hipótese)"
+            _mark_group(words, indices, "núcleo do predicativo do sujeito")
+            has_predicative = True
+        elif not direct_used:
+            term_type = "objeto direto (hipótese)"
+            direct_used = True
+            _mark_group(words, indices, "núcleo do objeto direto (hipótese)")
+            complements.append({"tipo": term_type, "texto": text})
+            if frame_type == "regência não cadastrada":
+                warnings.append(
+                    f"A regência de “{lemma}” não está cadastrada; “{text}” foi marcado como objeto direto por posição."
+                )
+        else:
+            term_type = "termo nominal adicional"
+            _mark_group(words, indices, "termo nominal adicional")
+        terms.append({"tipo": term_type, "texto": text})
+        last_nonprepositional_nouns = {
+            words[index].normalized
+            for index in indices
+            if words[index].classe == "substantivo"
+        }
+
+    if (
+        "subordinada adjetiva" in span.tipo
+        and span.connector_index is not None
+        and words[span.connector_index].classe == "pronome"
+    ):
+        relative = words[span.connector_index]
+        frame_type = frame.get("tipo", "")
+        if "VTD" in frame_type and not direct_used:
+            relative.funcao = "objeto direto da oração adjetiva"
+            terms.append(
+                {
+                    "tipo": "objeto direto representado pelo pronome relativo",
+                    "texto": relative.token,
+                }
+            )
+            direct_used = True
+        elif frame_type.startswith("VI"):
+            relative.funcao = "termo retomado pelo pronome relativo"
+
+    if lemma in OBJECT_PREDICATIVE_VERBS and direct_used:
+        adjective_after = next(iter(sorted(object_predicative_candidates)), None)
+        if adjective_after is None:
+            adjective_after = next(
+                (
+                    index
+                    for index in after
+                    if words[index].classe == "adjetivo"
+                    and "objeto" not in words[index].funcao
+                ),
+                None,
+            )
+        if adjective_after is not None:
+            words[adjective_after].funcao = "predicativo do objeto"
+            terms.append(
+                {
+                    "tipo": "predicativo do objeto",
+                    "texto": words[adjective_after].token,
+                }
+            )
+            has_predicative = True
+
+    # Advérbios e locuções circunstanciais simples.
+    for index in clause_indices:
+        if words[index].classe == "advérbio":
+            subtype = words[index].subclasse.split(" ")[0]
+            function = f"adjunto adverbial de {subtype}"
+            words[index].funcao = function
+            terms.append({"tipo": function, "texto": words[index].token})
+
+    if impersonal:
+        terms.insert(
+            0,
+            {
+                "tipo": "oração sem sujeito",
+                "texto": impersonal_reason,
+            },
+        )
+    elif subject_text:
+        terms.insert(
+            0,
+            {
+                "tipo": f"sujeito {subject_type}",
+                "texto": subject_text,
+            },
+        )
+
+    predicate_type = (
+        "verbo-nominal (hipótese)"
+        if has_predicative and not is_linking
+        else ("nominal" if has_predicative else "verbal")
+    )
+    predicate_indices = [
+        index
+        for index in clause_indices
+        if index not in excluded
+        and index != span.connector_index
+        and words[index].funcao != "núcleo do sujeito"
+    ]
+    predicate_text = _group_text(words, predicate_indices)
+    terms.insert(
+        1 if terms else 0,
+        {"tipo": f"predicado {predicate_type}", "texto": predicate_text},
+    )
+
+    if frame.get("tipo") == "regência não cadastrada":
+        regency = "regência não cadastrada; complementos marcados por hipótese contextual"
+    else:
+        preps = ", ".join(sorted(frame.get("preps", set())))
+        regency = frame["tipo"] + (f"; preposição esperada: {preps}" if preps else "")
+
+    return {
+        "texto": _group_text(words, span.indices),
+        "tipo": span.tipo,
+        "conector": (
+            words[span.connector_index].token
+            if span.connector_index is not None
+            else ""
+        ),
+        "sujeito": subject_text,
+        "tipo_sujeito": subject_type,
+        "predicado": predicate_text,
+        "tipo_predicado": predicate_type,
+        "verbo_principal": words[group.head_index].token,
+        "locucao_verbal": (
+            _group_text(words, group.indices) if len(group.indices) > 1 else ""
+        ),
+        "lema": lemma,
+        "regencia": regency,
+        "voz_verbal": voice,
+        "complementos": complements,
+        "termos": terms,
+    }
+
+
+def _syntactic_analysis_v2(words: list[WordAnalysis]) -> dict:
+    warnings: list[str] = []
+    for word in words:
+        if word.classe == "pontuação":
+            word.funcao = "sinal de pontuação"
+        elif word.classe == "interjeição":
+            word.funcao = "enunciado interjetivo"
+
+    groups = _build_verb_groups(words)
+    if not groups:
+        text = _join_tokens(word.token for word in words)
+        return {
+            "sujeito": "não se aplica sem oração reconhecida",
+            "tipo_sujeito": "não identificado",
+            "predicado": "não identificado",
+            "tipo_predicado": "não identificado",
+            "verbo_principal": "não identificado",
+            "complementos": [],
+            "oracoes": 0,
+            "oracoes_detalhadas": [],
+            "regencia": "não se aplica",
+            "voz_verbal": "não se aplica",
+            "termos": [{"tipo": "frase nominal", "texto": text}],
+            "avisos": [
+                "Não foi identificado verbo; há uma frase nominal ou uma forma verbal ainda não reconhecida."
+            ],
+        }
+
+    spans = _build_clause_spans(words, groups)
+    _classify_clauses(words, spans)
+    clauses = [_analyze_clause(words, span, warnings) for span in spans]
+
+    if len(clauses) > 1:
+        warnings.append(
+            f"Foram reconhecidas {len(clauses)} orações. Observe os conectores e confira relações que dependam do sentido completo."
+        )
+
+    # Orações substantivas e adjetivas exercem função na oração principal.
+    relation_terms: list[dict] = []
+    subordinate_complements: list[dict] = []
+    for clause in clauses:
+        if "subordinada substantiva objetiva direta" in clause["tipo"]:
+            item = {
+                "tipo": "oração com função de objeto direto",
+                "texto": clause["texto"],
+            }
+            relation_terms.append(item)
+            subordinate_complements.append(
+                {"tipo": "objeto direto oracional", "texto": clause["texto"]}
+            )
+        elif "subordinada adjetiva" in clause["tipo"]:
+            relation_terms.append(
+                {
+                    "tipo": "oração com função de adjunto adnominal",
+                    "texto": clause["texto"],
+                }
+            )
+
+    primary = next(
+        (
+            clause
+            for clause in clauses
+            if "principal" in clause["tipo"] or "absoluta" in clause["tipo"]
+        ),
+        clauses[0],
+    )
+    primary_predicate = primary["predicado"]
+    for complement in subordinate_complements:
+        if complement["texto"] not in primary_predicate:
+            primary_predicate = f"{primary_predicate} {complement['texto']}".strip()
+    all_terms = [
+        {**term, "oração": position + 1}
+        for position, clause in enumerate(clauses)
+        for term in clause["termos"]
+    ] + relation_terms
+
+    return {
+        "sujeito": primary["sujeito"],
+        "tipo_sujeito": primary["tipo_sujeito"],
+        "predicado": primary_predicate,
+        "tipo_predicado": primary["tipo_predicado"],
+        "verbo_principal": primary["verbo_principal"],
+        "locucao_verbal": primary["locucao_verbal"],
+        "complementos": primary["complementos"] + subordinate_complements,
+        "oracoes": len(clauses),
+        "oracoes_detalhadas": clauses,
+        "regencia": primary["regencia"],
+        "voz_verbal": primary["voz_verbal"],
+        "termos": all_terms,
+        "avisos": list(dict.fromkeys(warnings)),
+    }
+
+
 def analyze_sentence(sentence: str) -> dict:
     sentence = re.sub(r"\s+", " ", sentence.strip())
     if not sentence:
@@ -1100,7 +3102,7 @@ def analyze_sentence(sentence: str) -> dict:
     if len(sentence) > 500:
         raise ValueError("Use uma frase de até 500 caracteres por análise.")
 
-    tokens = TOKEN_RE.findall(sentence)
+    tokens = _tokenize_sentence(sentence)
     if not tokens:
         raise ValueError("Não foi possível identificar palavras nessa entrada.")
 
@@ -1108,7 +3110,8 @@ def analyze_sentence(sentence: str) -> dict:
     for index, token in enumerate(tokens):
         words.append(_classify_word(token, index, tokens, words))
 
-    syntax = _syntactic_analysis(words)
+    _refine_morphology(words, sentence)
+    syntax = _syntactic_analysis_v2(words)
     low_confidence = [word.token for word in words if word.confianca < 65]
     ambiguous = [word.token for word in words if word.alternativas]
 
@@ -1123,9 +3126,10 @@ def analyze_sentence(sentence: str) -> dict:
             "baixa_confianca": low_confidence,
             "ambiguidades": ambiguous,
             "nota": (
-                "Esta é uma hipótese didática baseada no contexto. Confira especialmente "
-                "as palavras marcadas como ambíguas."
+                "Motor contextual 2.0: regras morfológicas, locuções, regência e divisão "
+                "de orações. Confira especialmente palavras ambíguas e usos figurados."
             ),
+            "versao_motor": ENGINE_VERSION,
         },
         "legenda": CLASS_DESCRIPTIONS,
     }
