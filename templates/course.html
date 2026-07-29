@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header">
+    <span class="eyebrow">Trilha completa</span>
+    <h1>Curso de gramática</h1>
+    <p>Do reconhecimento das palavras à análise de períodos compostos. Cada aula apresenta conceito, comparação, exemplos e verificação.</p>
+</section>
+
+<div class="course-summary panel">
+    <div>
+        <span class="eyebrow">Seu progresso</span>
+        <strong>{{ completed_lessons }} de {{ total_lessons }} aulas</strong>
+    </div>
+    <div class="progress-track"><span style="width: {{ (completed_lessons / total_lessons * 100)|round|int }}%"></span></div>
+    <span>{{ (completed_lessons / total_lessons * 100)|round|int }}%</span>
+</div>
+
+<section class="module-list">
+    {% for module in modules %}
+    <article class="module-block">
+        <div class="module-title">
+            <span>{{ "%02d"|format(loop.index) }}</span>
+            <div><small>Módulo</small><h2>{{ module.name }}</h2></div>
+            <strong>{{ module.lessons|length }} aulas</strong>
+        </div>
+        <div class="lesson-grid">
+            {% for lesson in module.lessons %}
+            {% set lesson_progress = progress.get(lesson.id, {}) %}
+            <a class="lesson-card {{ 'completed' if lesson_progress.completed }}" href="{{ url_for('lesson', lesson_id=lesson.id) }}">
+                <div class="lesson-status">
+                    {% if lesson_progress.completed %}✓{% else %}{{ "%02d"|format(lesson.order) }}{% endif %}
+                </div>
+                <div>
+                    <small>Aula {{ lesson.order }}</small>
+                    <h3>{{ lesson.title }}</h3>
+                    <p>{{ lesson.description }}</p>
+                </div>
+                <span class="lesson-arrow">→</span>
+            </a>
+            {% endfor %}
+        </div>
+    </article>
+    {% endfor %}
+</section>
+{% endblock %}

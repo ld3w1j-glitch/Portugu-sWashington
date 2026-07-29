@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header">
+    <span class="eyebrow">Memória de estudo</span>
+    <h1>Histórico</h1>
+    <p>Retome frases já estudadas e acompanhe sua prática.</p>
+</section>
+
+<div class="history-stats stat-grid">
+    <article class="stat-card"><span class="stat-icon purple">⌕</span><div><strong>{{ stats.analyses }}</strong><span>análises</span></div></article>
+    <article class="stat-card"><span class="stat-icon green">✓</span><div><strong>{{ stats.correct }}</strong><span>acertos</span></div></article>
+    <article class="stat-card"><span class="stat-icon blue">◎</span><div><strong>{{ stats.accuracy }}%</strong><span>aproveitamento</span></div></article>
+    <article class="stat-card"><span class="stat-icon orange">▤</span><div><strong>{{ stats.completed_lessons }}</strong><span>aulas concluídas</span></div></article>
+</div>
+
+{% if analyses %}
+<section class="history-list">
+    {% for item in analyses %}
+    <a class="history-item panel" href="{{ url_for('saved_analysis', analysis_id=item.id) }}">
+        <div class="history-date"><strong>{{ item.created_at.split(' ')[0] }}</strong><small>{{ item.created_at.split(' ')[1] }}</small></div>
+        <div class="history-copy">
+            <h2>{{ item.sentence }}</h2>
+            <p>{{ item.result.sintaxe.tipo_sujeito|capitalize }} · predicado {{ item.result.sintaxe.tipo_predicado }} · {{ item.result.sintaxe.oracoes }} oração(ões)</p>
+        </div>
+        <div class="history-confidence"><strong>{{ item.result.qualidade.confianca_media }}%</strong><small>confiança</small></div>
+        <span class="history-arrow">→</span>
+    </a>
+    {% endfor %}
+</section>
+{% else %}
+<section class="empty-state panel">
+    <span>⌕</span>
+    <h2>Nenhuma análise registrada</h2>
+    <p>As frases que você analisar aparecerão aqui automaticamente.</p>
+    <a class="button primary" href="{{ url_for('analyzer') }}">Fazer primeira análise</a>
+</section>
+{% endif %}
+{% endblock %}

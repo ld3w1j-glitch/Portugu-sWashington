@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="lesson-layout">
+    <aside class="lesson-sidebar">
+        <a class="back-link" href="{{ url_for('course') }}">← Voltar ao curso</a>
+        <div class="lesson-position">
+            <span>Aula {{ lesson_number }} de {{ total_lessons }}</span>
+            <div class="progress-track"><span style="width: {{ (lesson_number / total_lessons * 100)|round|int }}%"></span></div>
+        </div>
+        <nav>
+            <a href="#objetivos">Objetivos</a>
+            {% for section in lesson.sections %}<a href="#secao-{{ loop.index }}">{{ section.title }}</a>{% endfor %}
+            <a href="#exemplos">Exemplos</a>
+            <a href="#verificacao">Verificação</a>
+        </nav>
+    </aside>
+
+    <article class="lesson-content">
+        <header class="lesson-hero">
+            <span class="eyebrow">{{ lesson.module }} · Aula {{ lesson_number }}</span>
+            <h1>{{ lesson.title }}</h1>
+            <p>{{ lesson.description }}</p>
+        </header>
+
+        <section id="objetivos" class="lesson-objectives panel">
+            <span class="eyebrow">Ao final desta aula</span>
+            <ul>{% for objective in lesson.objectives %}<li><span>✓</span>{{ objective }}</li>{% endfor %}</ul>
+        </section>
+
+        {% for section in lesson.sections %}
+        <section id="secao-{{ loop.index }}" class="lesson-section">
+            <span class="section-number">{{ "%02d"|format(loop.index) }}</span>
+            <div><h2>{{ section.title }}</h2><p>{{ section.text }}</p></div>
+        </section>
+        {% endfor %}
+
+        <section id="exemplos" class="example-section">
+            <span class="eyebrow">Observe no contexto</span>
+            <h2>Exemplos analisados</h2>
+            <div class="lesson-examples">
+                {% for example in lesson.examples %}
+                <article>
+                    <p>“{{ example.sentence }}”</p>
+                    <div><span>Foco</span><strong>{{ example.focus }}</strong></div>
+                    <div><span>Análise</span><strong>{{ example.answer }}</strong></div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <aside class="tip-box">
+            <span>!</span>
+            <div><strong>Estratégia de análise</strong><p>{{ lesson.tip }}</p></div>
+        </aside>
+
+        <section id="verificacao" class="quiz-box panel" data-lesson-id="{{ lesson.id }}" data-answer="{{ lesson.quiz.answer }}">
+            <span class="eyebrow">Verifique o entendimento</span>
+            <h2>{{ lesson.quiz.question }}</h2>
+            <div class="quiz-options">
+                {% for option in lesson.quiz.options %}
+                <button type="button" data-index="{{ loop.index0 }}"><span>{{ "ABCD"[loop.index0] }}</span>{{ option }}</button>
+                {% endfor %}
+            </div>
+            <div class="quiz-feedback" data-explanation="{{ lesson.quiz.explanation }}"></div>
+        </section>
+
+        <div class="lesson-finish">
+            <button class="button primary complete-lesson" type="button" data-lesson-id="{{ lesson.id }}">
+                {% if progress.completed %}Aula concluída ✓{% else %}Marcar aula como concluída{% endif %}
+            </button>
+        </div>
+
+        <nav class="lesson-navigation">
+            {% if previous_lesson %}
+            <a href="{{ url_for('lesson', lesson_id=previous_lesson.id) }}"><small>Anterior</small><strong>← {{ previous_lesson.title }}</strong></a>
+            {% else %}<span></span>{% endif %}
+            {% if next_lesson %}
+            <a class="next" href="{{ url_for('lesson', lesson_id=next_lesson.id) }}"><small>Próxima</small><strong>{{ next_lesson.title }} →</strong></a>
+            {% endif %}
+        </nav>
+    </article>
+</div>
+{% endblock %}

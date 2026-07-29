@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="empty-state not-found panel">
+    <span>404</span>
+    <h1>Página não encontrada</h1>
+    <p>O endereço não corresponde a nenhuma parte do curso.</p>
+    <a class="button primary" href="{{ url_for('index') }}">Voltar ao início</a>
+</section>
+{% endblock %}

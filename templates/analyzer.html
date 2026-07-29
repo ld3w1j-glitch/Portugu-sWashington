@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header compact">
+    <span class="eyebrow">Laboratório morfossintático</span>
+    <h1>Analisador de frases</h1>
+    <p>Digite uma frase curta. O sistema separará as palavras, proporá classes e funções e mostrará onde existe ambiguidade.</p>
+</section>
+
+<section class="analyzer-workspace">
+    <form class="analysis-form panel" method="post">
+        <label for="sentence">Frase para análise</label>
+        <div class="textarea-wrap">
+            <textarea id="sentence" name="sentence" rows="4" maxlength="500" placeholder="Ex.: O menino comprou um livro ontem." required>{{ sentence }}</textarea>
+            <span class="char-count"><span>{{ sentence|length }}</span>/500</span>
+        </div>
+        <div class="form-bottom">
+            <div class="example-list">
+                <span>Experimentar:</span>
+                <button type="button" data-example="O menino comprou um livro ontem.">Exemplo básico</button>
+                <button type="button" data-example="A aluna estava muito atenta.">Predicado nominal</button>
+                <button type="button" data-example="Estudei, mas ainda tenho dúvidas.">Duas orações</button>
+            </div>
+            <button class="button primary" type="submit">Analisar frase <span>→</span></button>
+        </div>
+    </form>
+
+    {% if error %}
+    <div class="alert danger"><strong>Não foi possível analisar.</strong> {{ error }}</div>
+    {% endif %}
+
+    {% if result %}
+    <section class="result-section">
+        <div class="result-heading">
+            <div>
+                <span class="eyebrow">Resultado da análise</span>
+                <h2>“{{ result.frase }}”</h2>
+                {% if saved_at %}<small>Análise registrada em {{ saved_at }}</small>{% endif %}
+            </div>
+            <div class="confidence-ring" style="--score: {{ result.qualidade.confianca_media }}">
+                <strong>{{ result.qualidade.confianca_media }}%</strong>
+                <small>confiança média</small>
+            </div>
+        </div>
+
+        {% if result.qualidade.ambiguidades %}
+        <div class="alert warning">
+            <strong>Leitura atenta:</strong>
+            {{ result.qualidade.ambiguidades|join(', ') }} {{ 'possui' if result.qualidade.ambiguidades|length == 1 else 'possuem' }}
+            outras classificações possíveis. Clique nas palavras para entender.
+        </div>
+        {% endif %}
+
+        <div class="panel word-panel">
+            <div class="panel-heading">
+                <div><span class="eyebrow">Morfologia</span><h3>Palavra por palavra</h3></div>
+                <small>Clique em uma palavra</small>
+            </div>
+            <div class="token-stream">
+                {% for word in result.palavras %}
+                {% if word.classe != "pontuação" %}
+                <button class="analysis-token" type="button" data-class="{{ word.classe }}" data-details="{{ word|tojson|forceescape }}">
+                    <strong>{{ word.token }}</strong>
+                    <small>{{ word.classe }}</small>
+                    {% if word.alternativas %}<span class="ambiguity-mark" title="Possui alternativas">?</span>{% endif %}
+                </button>
+                {% else %}
+                <span class="punctuation-token">{{ word.token }}</span>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <div class="word-detail empty" id="word-detail">
+                <span class="detail-class">EXPLORE A ANÁLISE</span>
+                <h4>Selecione uma palavra acima</h4>
+                <p>A explicação morfológica e a função sintática aparecerão aqui.</p>
+            </div>
+        </div>
+
+        <div class="syntax-grid">
+            <article class="syntax-card">
+                <span class="card-kicker">Sujeito</span>
+                <h3>{{ result.sintaxe.sujeito }}</h3>
+                <p>{{ result.sintaxe.tipo_sujeito|capitalize }}</p>
+            </article>
+            <article class="syntax-card">
+                <span class="card-kicker">Predicado {{ result.sintaxe.tipo_predicado }}</span>
+                <h3>{{ result.sintaxe.predicado }}</h3>
+                <p>Núcleo verbal: {{ result.sintaxe.verbo_principal|default('não identificado') }}</p>
+            </article>
+            <article class="syntax-card small-card">
+                <span class="card-kicker">Orações estimadas</span>
+                <strong>{{ result.sintaxe.oracoes }}</strong>
+                <p>Observe locuções e conectores.</p>
+            </article>
+        </div>
+
+        <div class="panel">
+            <div class="panel-heading">
+                <div><span class="eyebrow">Sintaxe</span><h3>Termos identificados</h3></div>
+            </div>
+            <div class="term-list">
+                {% for term in result.sintaxe.termos %}
+                <div><span>{{ term.tipo }}</span><strong>{{ term.texto }}</strong></div>
+                {% endfor %}
+            </div>
+            {% if result.sintaxe.avisos %}
+            <div class="analysis-notes">
+                {% for warning in result.sintaxe.avisos %}<p>• {{ warning }}</p>{% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <details class="panel word-table-panel">
+            <summary>Ver tabela completa da análise</summary>
+            <div class="table-scroll">
+                <table>
+                    <thead><tr><th>Palavra</th><th>Classe</th><th>Subclasse</th><th>Função</th><th>Confiança</th></tr></thead>
+                    <tbody>
+                    {% for word in result.palavras %}
+                    <tr>
+                        <td><strong>{{ word.token }}</strong></td>
+                        <td><span class="table-class" data-class="{{ word.classe }}">{{ word.classe }}</span></td>
+                        <td>{{ word.subclasse or '—' }}</td>
+                        <td>{{ word.funcao }}</td>
+                        <td>{{ word.confianca }}%</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </details>
+    </section>
+    {% else %}
+    <section class="analyzer-empty">
+        <div class="empty-orbit"><span>A</span><i></i><i></i><i></i></div>
+        <div>
+            <h2>Comece com uma frase simples</h2>
+            <p>Uma estrutura com sujeito, verbo e complemento ajuda você a entender primeiro o método de análise.</p>
+        </div>
+    </section>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Curso e analisador didático de morfologia e sintaxe da língua portuguesa.">
+    <title>{{ title }} · Gramática em Análise</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="topbar">
+            <a class="brand" href="{{ url_for('index') }}" aria-label="Gramática em Análise - início">
+                <span class="brand-mark">G<span>A</span></span>
+                <span class="brand-copy">
+                    <strong>Gramática</strong>
+                    <small>em Análise</small>
+                </span>
+            </a>
+
+            <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+
+            <nav class="main-nav" aria-label="Navegação principal">
+                <a class="{{ 'active' if request.endpoint == 'index' }}" href="{{ url_for('index') }}">
+                    <span class="nav-icon">⌂</span> Início
+                </a>
+                <a class="{{ 'active' if request.endpoint in ['analyzer', 'saved_analysis'] }}" href="{{ url_for('analyzer') }}">
+                    <span class="nav-icon">⌕</span> Analisador
+                </a>
+                <a class="{{ 'active' if request.endpoint in ['course', 'lesson'] }}" href="{{ url_for('course') }}">
+                    <span class="nav-icon">▤</span> Curso
+                </a>
+                <a class="{{ 'active' if request.endpoint == 'exercises' }}" href="{{ url_for('exercises') }}">
+                    <span class="nav-icon">✓</span> Exercícios
+                </a>
+                <a class="{{ 'active' if request.endpoint == 'history' }}" href="{{ url_for('history') }}">
+                    <span class="nav-icon">◷</span> Histórico
+                </a>
+            </nav>
+
+            <button class="theme-toggle" type="button" aria-label="Alternar tema" title="Alternar tema">
+                <span class="theme-icon">☾</span>
+            </button>
+        </header>
+
+        <div class="course-progress top-progress" aria-label="Progresso geral">
+            <span style="width: {{ (completed_lessons / total_lessons * 100)|round|int }}%"></span>
+        </div>
+
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="footer">
+            <p><strong>Gramática em Análise</strong> · Estudo offline com explicações contextuais.</p>
+            <p>O analisador apresenta hipóteses didáticas; casos ambíguos merecem conferência humana.</p>
+        </footer>
+    </div>
+
+    <div id="toast-region" class="toast-region" aria-live="polite"></div>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

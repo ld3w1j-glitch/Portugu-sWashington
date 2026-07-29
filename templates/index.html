@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-copy">
+        <span class="eyebrow">Morfologia + sintaxe + prática</span>
+        <h1>Entenda a língua<br><span>palavra por palavra.</span></h1>
+        <p>Analise frases, descubra classes gramaticais e compreenda a função de cada termo com explicações que mostram o raciocínio.</p>
+        <div class="hero-actions">
+            <a class="button primary" href="{{ url_for('analyzer') }}">Analisar uma frase <span>→</span></a>
+            <a class="button secondary" href="{{ url_for('lesson', lesson_id=first_pending.id) }}">Continuar o curso</a>
+        </div>
+        <div class="hero-note">
+            <span class="status-dot"></span>
+            Funciona localmente e mantém seu progresso neste computador.
+        </div>
+    </div>
+    <div class="hero-demo" aria-label="Demonstração da análise">
+        <div class="demo-header">
+            <span class="demo-dot red"></span>
+            <span class="demo-dot yellow"></span>
+            <span class="demo-dot green"></span>
+            <small>análise morfossintática</small>
+        </div>
+        <p class="demo-sentence">
+            <span data-class="artigo">O<small>artigo</small></span>
+            <span data-class="substantivo">aluno<small>substantivo</small></span>
+            <span data-class="adjetivo">atento<small>adjetivo</small></span>
+            <span data-class="verbo">resolveu<small>verbo</small></span>
+            <span data-class="artigo">a<small>artigo</small></span>
+            <span data-class="substantivo">questão<small>substantivo</small></span>
+            <span data-class="adverbio">rapidamente<small>advérbio</small></span>
+        </p>
+        <div class="demo-syntax">
+            <div><small>Sujeito simples</small><strong>O aluno atento</strong></div>
+            <div><small>Predicado verbal</small><strong>resolveu a questão rapidamente</strong></div>
+        </div>
+    </div>
+</section>
+
+<section class="dashboard-section">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Seu estudo</span>
+            <h2>Visão geral</h2>
+        </div>
+        <span class="progress-label">{{ progress_percentage }}% do curso concluído</span>
+    </div>
+
+    <div class="stat-grid">
+        <article class="stat-card">
+            <span class="stat-icon purple">⌕</span>
+            <div><strong>{{ stats.analyses }}</strong><span>frases analisadas</span></div>
+        </article>
+        <article class="stat-card">
+            <span class="stat-icon blue">▤</span>
+            <div><strong>{{ stats.completed_lessons }}/{{ total_lessons }}</strong><span>aulas concluídas</span></div>
+        </article>
+        <article class="stat-card">
+            <span class="stat-icon green">✓</span>
+            <div><strong>{{ stats.accuracy }}%</strong><span>acertos nos exercícios</span></div>
+        </article>
+        <article class="stat-card">
+            <span class="stat-icon orange">◎</span>
+            <div><strong>{{ stats.attempts }}</strong><span>respostas registradas</span></div>
+        </article>
+    </div>
+</section>
+
+<section class="feature-grid">
+    <a class="feature-card analyzer-feature" href="{{ url_for('analyzer') }}">
+        <span class="feature-number">01</span>
+        <div>
+            <span class="eyebrow">Laboratório</span>
+            <h3>Analisador de frases</h3>
+            <p>Veja classe, flexão, função sintática, sujeito, predicado e ambiguidades.</p>
+        </div>
+        <span class="feature-arrow">↗</span>
+    </a>
+    <a class="feature-card" href="{{ url_for('course') }}">
+        <span class="feature-number">02</span>
+        <div>
+            <span class="eyebrow">20 aulas</span>
+            <h3>Curso progressivo</h3>
+            <p>Comece pelas classes gramaticais e avance até o período composto.</p>
+        </div>
+        <span class="feature-arrow">↗</span>
+    </a>
+    <a class="feature-card" href="{{ url_for('exercises') }}">
+        <span class="feature-number">03</span>
+        <div>
+            <span class="eyebrow">Prática ativa</span>
+            <h3>Exercícios e impressão</h3>
+            <p>Responda na tela ou imprima folhas econômicas para resolver à mão.</p>
+        </div>
+        <span class="feature-arrow">↗</span>
+    </a>
+</section>
+
+{% if recent %}
+<section class="recent-section">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Retomar</span>
+            <h2>Análises recentes</h2>
+        </div>
+        <a class="text-link" href="{{ url_for('history') }}">Ver histórico →</a>
+    </div>
+    <div class="recent-list">
+        {% for item in recent %}
+        <a href="{{ url_for('saved_analysis', analysis_id=item.id) }}">
+            <span class="recent-index">{{ "%02d"|format(loop.index) }}</span>
+            <span class="recent-copy"><strong>{{ item.sentence }}</strong><small>{{ item.created_at }}</small></span>
+            <span class="recent-score">{{ item.result.qualidade.confianca_media }}% <small>confiança</small></span>
+            <span>→</span>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

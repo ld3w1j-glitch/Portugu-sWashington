@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header exercise-header">
+    <div>
+        <span class="eyebrow">Prática ativa</span>
+        <h1>Exercícios</h1>
+        <p>Responda na tela ou prepare uma folha limpa para resolver à mão.</p>
+    </div>
+    <div class="print-actions no-print">
+        <label><input type="checkbox" id="print-answer-key"> Incluir gabarito</label>
+        <button class="button secondary print-button" type="button">Imprimir folha</button>
+    </div>
+</section>
+
+<form class="exercise-filter panel no-print" method="get">
+    <label>Nível
+        <select name="nivel">
+            <option value="todos" {{ 'selected' if level == 'todos' }}>Todos</option>
+            <option value="iniciante" {{ 'selected' if level == 'iniciante' }}>Iniciante</option>
+            <option value="intermediario" {{ 'selected' if level == 'intermediario' }}>Intermediário</option>
+            <option value="avancado" {{ 'selected' if level == 'avancado' }}>Avançado</option>
+        </select>
+    </label>
+    <label>Quantidade
+        <select name="quantidade">
+            {% for number in [5, 10, 15, 20] %}<option value="{{ number }}" {{ 'selected' if quantity == number }}>{{ number }}</option>{% endfor %}
+        </select>
+    </label>
+    <button class="button primary" type="submit">Gerar nova lista</button>
+</form>
+
+<div class="worksheet-title print-only">
+    <h1>Gramática em Análise · Lista de exercícios</h1>
+    <p>Nome: __________________________________________ Data: ____/____/________</p>
+</div>
+
+<section class="exercise-list">
+    {% for exercise in exercises %}
+    <article class="exercise-card panel" data-exercise-id="{{ exercise.id }}" data-answer="{{ exercise.answer }}">
+        <header>
+            <span>Questão {{ loop.index }}</span>
+            <small>{{ exercise.level|capitalize }} · {{ exercise.type|capitalize }}</small>
+        </header>
+        <h2>{{ exercise.prompt }}</h2>
+        <p class="exercise-sentence">{{ exercise.sentence|replace('[', '<mark>')|replace(']', '</mark>')|safe }}</p>
+        <div class="exercise-options">
+            {% for option in exercise.options %}
+            <button type="button" data-value="{{ option }}"><span>{{ "ABCD"[loop.index0] }}</span>{{ option }}</button>
+            {% endfor %}
+        </div>
+        <div class="paper-lines print-only"><span></span><span></span></div>
+        <div class="exercise-feedback" data-explanation="{{ exercise.explanation }}"></div>
+        <div class="answer-key print-answer-key"><strong>Resposta:</strong> {{ exercise.answer }}. {{ exercise.explanation }}</div>
+    </article>
+    {% endfor %}
+</section>
+
+<section class="exercise-score panel no-print">
+    <div><span class="eyebrow">Resultado desta lista</span><h2><strong>0</strong> de {{ exercises|length }} respondidas corretamente</h2></div>
+    <div class="score-bar"><span style="width: 0%"></span></div>
+</section>
+{% endblock %}
