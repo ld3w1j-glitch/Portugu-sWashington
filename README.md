@@ -10,10 +10,12 @@ próprio computador.
 - dez classes gramaticais com cores e explicações;
 - identificação didática de sujeito, predicado, complementos e adjuntos;
 - indicação de confiança e de classificações alternativas;
-- curso progressivo com 20 aulas;
-- 30 exercícios iniciantes, intermediários e avançados;
+- curso progressivo com 26 aulas;
+- 42 exercícios iniciantes, intermediários e avançados;
+- filtros por assunto e revisão das questões erradas;
 - folha A4 econômica e opção de imprimir com gabarito;
-- histórico de análises, progresso e aproveitamento em SQLite;
+- histórico pesquisável, exclusão individual e backup em JSON;
+- regência, voz verbal, locuções e classificação detalhada das orações;
 - layout responsivo para computador e celular;
 - funcionamento offline depois da instalação inicial;
 - configuração pronta para Railway.
@@ -81,7 +83,8 @@ que motivou a classificação.
 ## Dados
 
 O banco é criado automaticamente em `data/gramatica.db`. Para fazer uma cópia
-de segurança do progresso, feche o sistema e copie esse arquivo.
+de segurança, use **Histórico → Exportar backup** ou feche o sistema e copie
+esse arquivo.
 
 O horário é registrado com deslocamento UTC-03 sem depender do pacote
 `tzdata`, evitando erros de `ZoneInfo` em instalações Windows.
@@ -104,3 +107,4 @@ durante a criação orientou a abrangência do curso.
 O projeto inclui `railway.json` e `Procfile`. Em hospedagens efêmeras, o banco
 SQLite deve ficar em um volume persistente para não perder o progresso durante
 novos deploys. Para uso individual, a versão local é a opção mais simples.
+No Railway, defina `DATABASE_PATH` com o caminho do banco dentro do volume.

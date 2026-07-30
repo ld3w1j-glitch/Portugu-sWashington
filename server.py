@@ -22,4 +22,5 @@ if __name__ == "__main__":
         threading.Timer(1.2, open_local_browser, args=(port,)).start()
         print(f"\nGramática em Análise: http://127.0.0.1:{port}")
         print("Para encerrar, pressione Ctrl+C.\n")
-    serve(app, host="0.0.0.0", port=port, threads=6)
+    host = "0.0.0.0" if is_cloud else "127.0.0.1"
+    serve(app, host=host, port=port, threads=6)

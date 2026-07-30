@@ -96,6 +96,44 @@ class Database:
             "created_at": row["created_at"],
         }
 
+    def search_analyses(self, query: str, limit: int = 100) -> list[dict]:
+        query = query.strip()
+        if not query:
+            return self.recent_analyses(limit)
+        with self.connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT id, sentence, result_json, created_at
+                FROM analyses
+                WHERE sentence LIKE ? COLLATE NOCASE
+                ORDER BY id DESC
+                LIMIT ?
+                """,
+                (f"%{query}%", limit),
+            ).fetchall()
+        return [
+            {
+                "id": row["id"],
+                "sentence": row["sentence"],
+                "result": json.loads(row["result_json"]),
+                "created_at": row["created_at"],
+            }
+            for row in rows
+        ]
+
+    def delete_analysis(self, analysis_id: int) -> bool:
+        with self.connect() as connection:
+            cursor = connection.execute(
+                "DELETE FROM analyses WHERE id = ?",
+                (analysis_id,),
+            )
+            return cursor.rowcount > 0
+
+    def clear_analyses(self) -> int:
+        with self.connect() as connection:
+            cursor = connection.execute("DELETE FROM analyses")
+            return cursor.rowcount
+
     def save_progress(self, lesson_id: str, completed: bool, score: int):
         with self.connect() as connection:
             connection.execute(
@@ -103,7 +141,7 @@ class Database:
                 INSERT INTO lesson_progress(lesson_id, completed, score, updated_at)
                 VALUES (?, ?, ?, ?)
                 ON CONFLICT(lesson_id) DO UPDATE SET
-                    completed = MAX(lesson_progress.completed, excluded.completed),
+                    completed = excluded.completed,
                     score = MAX(lesson_progress.score, excluded.score),
                     updated_at = excluded.updated_at
                 """,
@@ -148,6 +186,65 @@ class Database:
                     now_text(),
                 ),
             )
+
+    def incorrect_exercise_ids(self) -> set[int]:
+        with self.connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT attempt.exercise_id
+                FROM attempts AS attempt
+                INNER JOIN (
+                    SELECT exercise_id, MAX(id) AS latest_id
+                    FROM attempts
+                    WHERE exercise_id IS NOT NULL
+                    GROUP BY exercise_id
+                ) AS latest ON latest.latest_id = attempt.id
+                WHERE attempt.is_correct = 0
+                """
+            ).fetchall()
+        return {int(row["exercise_id"]) for row in rows}
+
+    def export_data(self) -> dict:
+        with self.connect() as connection:
+            analyses = [
+                dict(row)
+                for row in connection.execute(
+                    """
+                    SELECT id, sentence, result_json, created_at
+                    FROM analyses
+                    ORDER BY id
+                    """
+                ).fetchall()
+            ]
+            progress = [
+                dict(row)
+                for row in connection.execute(
+                    """
+                    SELECT lesson_id, completed, score, updated_at
+                    FROM lesson_progress
+                    ORDER BY lesson_id
+                    """
+                ).fetchall()
+            ]
+            attempts = [
+                dict(row)
+                for row in connection.execute(
+                    """
+                    SELECT id, exercise_id, question, user_answer, correct_answer,
+                           is_correct, created_at
+                    FROM attempts
+                    ORDER BY id
+                    """
+                ).fetchall()
+            ]
+        for item in analyses:
+            item["result"] = json.loads(item.pop("result_json"))
+        return {
+            "exported_at": now_text(),
+            "analyses": analyses,
+            "lesson_progress": progress,
+            "attempts": attempts,
+        }
 
     def stats(self) -> dict:
         with self.connect() as connection:

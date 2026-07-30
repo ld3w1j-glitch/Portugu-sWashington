@@ -422,7 +422,8 @@ h1, h2, h3, h4 {
 [data-class="numeral"] { --class-color: #ffd166; }
 [data-class="verbo"] { --class-color: #ff7187; }
 [data-class="advérbio"],
-[data-class="adverbio"] { --class-color: #ffad66; }
+[data-class="adverbio"],
+[data-class="advérbio"] { --class-color: #ffad66; }
 [data-class="preposição"] { --class-color: #5fd4cd; }
 [data-class="conjunção"] { --class-color: #c98cff; }
 [data-class="interjeição"] { --class-color: #ff8c6b; }
@@ -992,6 +993,112 @@ textarea:focus {
     display: block;
     font-size: 45px;
     line-height: 1;
+}
+
+.analysis-meta-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(2, 1fr);
+    margin-bottom: 15px;
+}
+
+.analysis-meta-card {
+    background: var(--panel-soft);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    display: grid;
+    gap: 5px;
+    padding: 15px 17px;
+}
+
+.analysis-meta-card span,
+.clause-card header span {
+    color: var(--faint);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.analysis-meta-card strong {
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.clause-list {
+    display: grid;
+    gap: 10px;
+}
+
+.clause-card {
+    background: var(--panel-soft);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 17px;
+}
+
+.clause-card header {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+}
+
+.clause-card header strong {
+    color: var(--primary-strong);
+    font-size: 10px;
+    text-align: right;
+}
+
+.clause-card > p {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 12px 0;
+}
+
+.clause-card dl {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+}
+
+.clause-card dl > div {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 75px 1fr;
+}
+
+.clause-card dt {
+    color: var(--faint);
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.clause-card dd {
+    color: var(--muted);
+    font-size: 11px;
+    margin: 0;
+}
+
+.engine-note {
+    align-items: start;
+    color: var(--faint);
+    display: flex;
+    font-size: 10px;
+    gap: 14px;
+    margin: 8px 3px 18px;
+}
+
+.engine-note span {
+    color: var(--primary-strong);
+    flex: 0 0 auto;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.engine-note p {
+    margin: 0;
 }
 
 .result-section > .panel:not(.word-panel) {
@@ -1625,6 +1732,18 @@ th, td {
     text-transform: uppercase;
 }
 
+.exercise-filter .review-filter {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 7px;
+    padding-bottom: 10px;
+}
+
+.exercise-filter .review-filter input {
+    accent-color: var(--primary);
+}
+
 select {
     background: var(--panel-soft);
     border: 1px solid var(--line);
@@ -1729,9 +1848,65 @@ mark {
     margin-bottom: 30px;
 }
 
+.history-tools {
+    align-items: end;
+    box-shadow: none;
+    display: flex;
+    gap: 18px;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    padding: 16px;
+}
+
+.history-tools > form {
+    flex: 1;
+}
+
+.history-tools label {
+    color: var(--faint);
+    display: block;
+    font-size: 9px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.history-tools form > div,
+.history-actions {
+    align-items: center;
+    display: flex;
+    gap: 9px;
+}
+
+.history-tools input {
+    background: var(--panel-soft);
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    color: var(--text);
+    min-width: 260px;
+    outline: 0;
+    padding: 10px 12px;
+}
+
+.history-tools input:focus {
+    border-color: var(--primary);
+}
+
+.danger-button {
+    background: rgba(255, 113, 135, .09);
+    border-color: rgba(255, 113, 135, .25);
+    color: var(--red);
+}
+
 .history-list {
     display: grid;
     gap: 9px;
+}
+
+.history-row {
+    align-items: center;
+    display: grid;
+    gap: 8px;
+    grid-template-columns: 1fr auto;
 }
 
 .history-item {
@@ -1742,6 +1917,25 @@ mark {
     grid-template-columns: 85px 1fr auto 20px;
     padding: 17px 20px;
     transition: transform .2s, border-color .2s;
+}
+
+.history-delete {
+    align-items: center;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--faint);
+    cursor: pointer;
+    display: flex;
+    font-size: 18px;
+    height: 38px;
+    justify-content: center;
+    width: 38px;
+}
+
+.history-delete:hover {
+    border-color: rgba(255, 113, 135, .4);
+    color: var(--red);
 }
 
 .history-item:hover {
@@ -1965,10 +2159,21 @@ mark {
     .stat-grid,
     .lesson-grid,
     .syntax-grid,
+    .analysis-meta-grid,
     .quiz-options,
     .exercise-options,
     .term-list {
         grid-template-columns: 1fr;
+    }
+
+    .clause-card header,
+    .engine-note {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .clause-card header strong {
+        text-align: left;
     }
 
     .section-heading {
@@ -2055,6 +2260,18 @@ mark {
     .history-item {
         gap: 10px;
         grid-template-columns: 60px 1fr 18px;
+    }
+
+    .history-tools,
+    .history-tools form > div,
+    .history-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .history-tools input {
+        min-width: 0;
+        width: 100%;
     }
 
     .history-confidence {

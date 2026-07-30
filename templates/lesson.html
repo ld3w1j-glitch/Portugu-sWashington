@@ -66,8 +66,10 @@
         </section>
 
         <div class="lesson-finish">
-            <button class="button primary complete-lesson" type="button" data-lesson-id="{{ lesson.id }}">
-                {% if progress.completed %}Aula concluída ✓{% else %}Marcar aula como concluída{% endif %}
+            <button class="button primary complete-lesson" type="button"
+                    data-lesson-id="{{ lesson.id }}"
+                    data-completed="{{ 'true' if progress.completed else 'false' }}">
+                {% if progress.completed %}Aula concluída ✓ · reabrir{% else %}Marcar aula como concluída{% endif %}
             </button>
         </div>
 

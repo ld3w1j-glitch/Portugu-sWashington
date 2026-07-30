@@ -27,6 +27,19 @@
             {% for number in [5, 10, 15, 20] %}<option value="{{ number }}" {{ 'selected' if quantity == number }}>{{ number }}</option>{% endfor %}
         </select>
     </label>
+    <label>Assunto
+        <select name="tipo">
+            <option value="todos" {{ 'selected' if exercise_type == 'todos' }}>Todos</option>
+            <option value="classe" {{ 'selected' if exercise_type == 'classe' }}>Classes gramaticais</option>
+            <option value="função" {{ 'selected' if exercise_type == 'função' }}>Funções sintáticas</option>
+            <option value="oração" {{ 'selected' if exercise_type == 'oração' }}>Orações</option>
+            <option value="morfossintaxe" {{ 'selected' if exercise_type == 'morfossintaxe' }}>Morfossintaxe</option>
+        </select>
+    </label>
+    <label class="review-filter">
+        <input type="checkbox" name="revisar" value="erros" {{ 'checked' if review_errors }}>
+        Revisar erros ({{ review_count }})
+    </label>
     <button class="button primary" type="submit">Gerar nova lista</button>
 </form>
 
@@ -36,6 +49,14 @@
 </div>
 
 <section class="exercise-list">
+    {% if not exercises %}
+    <div class="empty-state panel">
+        <span>✓</span>
+        <h2>Nenhum erro pendente neste filtro</h2>
+        <p>Responda outros exercícios ou desative “Revisar erros”.</p>
+        <a class="button primary" href="{{ url_for('exercises') }}">Ver todos os exercícios</a>
+    </div>
+    {% endif %}
     {% for exercise in exercises %}
     <article class="exercise-card panel" data-exercise-id="{{ exercise.id }}" data-answer="{{ exercise.answer }}">
         <header>
@@ -56,8 +77,10 @@
     {% endfor %}
 </section>
 
+{% if exercises %}
 <section class="exercise-score panel no-print">
     <div><span class="eyebrow">Resultado desta lista</span><h2><strong>0</strong> de {{ exercises|length }} respondidas corretamente</h2></div>
     <div class="score-bar"><span style="width: 0%"></span></div>
 </section>
+{% endif %}
 {% endblock %}

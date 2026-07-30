@@ -51,6 +51,15 @@
         </div>
         {% endif %}
 
+        {% if result.qualidade.baixa_confianca %}
+        <div class="alert warning">
+            <strong>Vale conferir:</strong>
+            o motor encontrou baixa confiança em
+            {{ result.qualidade.baixa_confianca|join(', ') }}.
+            A explicação de cada palavra mostra qual hipótese foi usada.
+        </div>
+        {% endif %}
+
         <div class="panel word-panel">
             <div class="panel-heading">
                 <div><span class="eyebrow">Morfologia</span><h3>Palavra por palavra</h3></div>
@@ -94,6 +103,59 @@
             </article>
         </div>
 
+        <div class="analysis-meta-grid">
+            <article class="analysis-meta-card">
+                <span>Voz verbal</span>
+                <strong>{{ result.sintaxe.voz_verbal|default('não identificada', true) }}</strong>
+            </article>
+            <article class="analysis-meta-card">
+                <span>Regência do verbo principal</span>
+                <strong>{{ result.sintaxe.regencia|default('não cadastrada', true) }}</strong>
+            </article>
+            <article class="analysis-meta-card">
+                <span>Locução verbal</span>
+                <strong>{{ result.sintaxe.locucao_verbal|default('não identificada', true) or 'não identificada' }}</strong>
+            </article>
+            <article class="analysis-meta-card">
+                <span>Complementos</span>
+                <strong>
+                    {% if result.sintaxe.complementos %}
+                        {% for complement in result.sintaxe.complementos %}
+                            {{ complement.tipo }}: {{ complement.texto }}{{ ' · ' if not loop.last }}
+                        {% endfor %}
+                    {% else %}
+                        nenhum complemento registrado
+                    {% endif %}
+                </strong>
+            </article>
+        </div>
+
+        {% if result.sintaxe.oracoes_detalhadas %}
+        <div class="panel clause-panel">
+            <div class="panel-heading">
+                <div><span class="eyebrow">Período</span><h3>Análise de cada oração</h3></div>
+                <small>{{ result.sintaxe.oracoes_detalhadas|length }} estrutura(s)</small>
+            </div>
+            <div class="clause-list">
+                {% for clause in result.sintaxe.oracoes_detalhadas %}
+                <article class="clause-card">
+                    <header>
+                        <span>Oração {{ loop.index }}</span>
+                        <strong>{{ clause.tipo }}</strong>
+                    </header>
+                    <p>“{{ clause.texto }}”</p>
+                    <dl>
+                        <div><dt>Sujeito</dt><dd>{{ clause.sujeito }} · {{ clause.tipo_sujeito }}</dd></div>
+                        <div><dt>Predicado</dt><dd>{{ clause.predicado }} · {{ clause.tipo_predicado }}</dd></div>
+                        <div><dt>Verbo</dt><dd>{{ clause.verbo_principal }}{% if clause.locucao_verbal %} · {{ clause.locucao_verbal }}{% endif %}</dd></div>
+                        {% if clause.conector %}<div><dt>Conector</dt><dd>{{ clause.conector }}</dd></div>{% endif %}
+                    </dl>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
         <div class="panel">
             <div class="panel-heading">
                 <div><span class="eyebrow">Sintaxe</span><h3>Termos identificados</h3></div>
@@ -108,6 +170,11 @@
                 {% for warning in result.sintaxe.avisos %}<p>• {{ warning }}</p>{% endfor %}
             </div>
             {% endif %}
+        </div>
+
+        <div class="engine-note">
+            <span>Motor {{ result.qualidade.versao_motor|default('contextual') }}</span>
+            <p>{{ result.qualidade.nota }}</p>
         </div>
 
         <details class="panel word-table-panel">

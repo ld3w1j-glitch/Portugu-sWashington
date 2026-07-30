@@ -594,6 +594,396 @@ LESSONS = [
     },
 ]
 
+LESSONS.extend(
+    [
+        {
+            "id": "formacao-palavras",
+            "module": "Estrutura e escrita",
+            "order": 21,
+            "title": "Estrutura e formação das palavras",
+            "description": "Radical, afixos, desinências, composição e derivação.",
+            "objectives": [
+                "Reconhecer as partes que formam uma palavra.",
+                "Distinguir derivação de composição.",
+                "Relacionar a formação ao significado.",
+            ],
+            "sections": [
+                {
+                    "title": "Partes da palavra",
+                    "text": (
+                        "O radical concentra a base de significado compartilhada por palavras "
+                        "da mesma família: feliz, felicidade e infelizmente. Prefixos aparecem "
+                        "antes do radical; sufixos aparecem depois. Desinências indicam flexões "
+                        "como gênero, número, pessoa, tempo e modo. A vogal temática liga o radical "
+                        "às desinências verbais ou nominais."
+                    ),
+                },
+                {
+                    "title": "Derivação",
+                    "text": (
+                        "Na derivação, uma palavra nova nasce de outra já existente. Pode ocorrer "
+                        "por prefixação, sufixação, uso simultâneo de prefixo e sufixo, mudança de "
+                        "classe sem alteração formal ou redução. Em infeliz há prefixação; em "
+                        "felicidade há sufixação; em anoitecer ocorre derivação parassintética."
+                    ),
+                },
+                {
+                    "title": "Composição",
+                    "text": (
+                        "Na composição, dois ou mais radicais formam uma unidade. Na justaposição, "
+                        "as bases permanecem reconhecíveis, como guarda-chuva. Na aglutinação, há "
+                        "alteração sonora ou gráfica, como planalto, formado historicamente por "
+                        "plano e alto. O contexto confirma se o conjunto funciona como uma palavra."
+                    ),
+                },
+            ],
+            "examples": [
+                {
+                    "sentence": "Infelizmente, a atividade terminou.",
+                    "focus": "infeliz + mente",
+                    "answer": "Prefixação e sufixação em etapas.",
+                },
+                {
+                    "sentence": "O guarda-chuva ficou no carro.",
+                    "focus": "guarda-chuva",
+                    "answer": "Composição por justaposição.",
+                },
+            ],
+            "tip": "Procure primeiro o radical e depois observe o que foi acrescentado antes ou depois dele.",
+            "quiz": {
+                "question": "Qual palavra apresenta composição por justaposição?",
+                "options": ["Guarda-roupa", "Infeliz", "Felizmente", "Refazer"],
+                "answer": 0,
+                "explanation": "Guarda-roupa reúne dois radicais que permanecem reconhecíveis.",
+            },
+        },
+        {
+            "id": "ortografia-acentuacao",
+            "module": "Estrutura e escrita",
+            "order": 22,
+            "title": "Ortografia e acentuação",
+            "description": "Sílaba tônica, regras de acento e dúvidas ortográficas frequentes.",
+            "objectives": [
+                "Identificar oxítonas, paroxítonas e proparoxítonas.",
+                "Aplicar regras gerais de acentuação.",
+                "Usar a grafia correta em pares frequentes.",
+            ],
+            "sections": [
+                {
+                    "title": "Posição da sílaba tônica",
+                    "text": (
+                        "Oxítonas apresentam a última sílaba tônica; paroxítonas, a penúltima; "
+                        "proparoxítonas, a antepenúltima. Toda proparoxítona é acentuada. Oxítonas "
+                        "terminadas em a, e, o, em e ens recebem acento, inclusive suas formas "
+                        "plurais. As paroxítonas seguem regras específicas de terminação."
+                    ),
+                },
+                {
+                    "title": "Hiato e acentos diferenciais",
+                    "text": (
+                        "Em muitos hiatos, i e u tônicos recebem acento quando formam sílaba "
+                        "sozinhos ou com s, como saída e baú. Alguns acentos diferenciam palavras: "
+                        "pôde indica passado e pode indica presente; pôr é verbo e por é preposição. "
+                        "O acento também distingue têm de tem e vêm de vem."
+                    ),
+                },
+                {
+                    "title": "Grafias que exigem contexto",
+                    "text": (
+                        "Por que aparece em perguntas ou quando equivale a pelo qual; porque costuma "
+                        "introduzir explicação ou causa; por quê recebe acento no fim; porquê é "
+                        "substantivo. Há indica existência ou tempo passado, enquanto a pode ser "
+                        "artigo, preposição ou marca de tempo futuro."
+                    ),
+                },
+            ],
+            "examples": [
+                {
+                    "sentence": "Ele não veio porque estava doente.",
+                    "focus": "porque",
+                    "answer": "Conjunção causal ou explicativa.",
+                },
+                {
+                    "sentence": "Há dois anos estudo português.",
+                    "focus": "há",
+                    "answer": "Verbo haver indicando tempo passado.",
+                },
+            ],
+            "tip": "Antes de decorar a grafia, substitua a expressão por outra equivalente e observe o sentido.",
+            "quiz": {
+                "question": "Qual frase usa corretamente a expressão de causa?",
+                "options": [
+                    "Faltei porque estava doente.",
+                    "Faltei por quê estava doente.",
+                    "Faltei por que estava doente.",
+                    "Faltei o porquê estava doente.",
+                ],
+                "answer": 0,
+                "explanation": "Porque introduz a causa de faltar.",
+            },
+        },
+        {
+            "id": "concordancia",
+            "module": "Norma e construção",
+            "order": 23,
+            "title": "Concordância verbal e nominal",
+            "description": "Como verbos e nomes ajustam pessoa, número e gênero.",
+            "objectives": [
+                "Fazer o verbo concordar com o núcleo do sujeito.",
+                "Reconhecer casos de sujeito composto e expressões partitivas.",
+                "Aplicar concordância entre substantivos e seus modificadores.",
+            ],
+            "sections": [
+                {
+                    "title": "Concordância verbal",
+                    "text": (
+                        "O verbo normalmente concorda em pessoa e número com o núcleo do sujeito. "
+                        "Em Os alunos chegaram, o núcleo alunos exige plural. O sujeito pode vir "
+                        "depois do verbo sem perder essa relação. Com sujeito composto anteposto, "
+                        "o plural é a forma esperada: Pedro e Ana estudaram."
+                    ),
+                },
+                {
+                    "title": "Casos especiais",
+                    "text": (
+                        "O verbo haver com sentido de existir permanece no singular: havia problemas. "
+                        "O verbo fazer indicando tempo também fica no singular: faz dois anos. "
+                        "Expressões como a maioria de admitem concordância com o núcleo coletivo ou, "
+                        "em certos contextos, com o termo plural que o especifica."
+                    ),
+                },
+                {
+                    "title": "Concordância nominal",
+                    "text": (
+                        "Artigos, pronomes, numerais e adjetivos concordam com o substantivo a que "
+                        "se referem. Quando um adjetivo caracteriza mais de um substantivo, gênero, "
+                        "posição e sentido influenciam a forma escolhida. Palavras como meio, bastante "
+                        "e anexo variam ou permanecem invariáveis conforme a classe usada na frase."
+                    ),
+                },
+            ],
+            "examples": [
+                {
+                    "sentence": "Faz três meses que comecei.",
+                    "focus": "faz",
+                    "answer": "Singular por indicar tempo decorrido.",
+                },
+                {
+                    "sentence": "As atividades estavam completas.",
+                    "focus": "completas",
+                    "answer": "Feminino plural em concordância com atividades.",
+                },
+            ],
+            "tip": "Localize o núcleo antes de decidir a forma do verbo ou do adjetivo.",
+            "quiz": {
+                "question": "Qual frase segue a concordância padrão?",
+                "options": [
+                    "Havia muitos problemas.",
+                    "Haviam muitos problemas.",
+                    "Fazem dois anos.",
+                    "Existe muitas dúvidas.",
+                ],
+                "answer": 0,
+                "explanation": "Haver com sentido de existir é impessoal e permanece no singular.",
+            },
+        },
+        {
+            "id": "regencia-crase",
+            "module": "Norma e construção",
+            "order": 24,
+            "title": "Regência verbal, nominal e crase",
+            "description": "Preposições exigidas e o encontro que produz a crase.",
+            "objectives": [
+                "Identificar preposições exigidas por verbos e nomes.",
+                "Distinguir objeto indireto de adjunto adverbial.",
+                "Aplicar o teste da crase.",
+            ],
+            "sections": [
+                {
+                    "title": "Regência",
+                    "text": (
+                        "Regência é a relação em que um termo exige ou seleciona uma preposição. "
+                        "Gostar pede de; obedecer pede a; confiar pede em. Nomes também podem exigir "
+                        "complemento: necessidade de apoio e respeito às regras. O sentido do verbo "
+                        "pode mudar sua regência, como ocorre com assistir."
+                    ),
+                },
+                {
+                    "title": "Crase",
+                    "text": (
+                        "A crase gráfica indica a fusão da preposição a com o artigo feminino a ou "
+                        "com formas iniciadas por aquele. Troque o termo feminino por um masculino: "
+                        "se aparecer ao, haverá crase no feminino. Fui ao mercado; fui à escola. "
+                        "Não há crase antes de verbo nem, em regra, antes de palavra masculina."
+                    ),
+                },
+                {
+                    "title": "Sentido antes da regra",
+                    "text": (
+                        "Nem todo a recebe acento. Em Vi a professora, o a é apenas artigo e introduz "
+                        "objeto direto. Em Entreguei o relatório à professora, o verbo organiza dois "
+                        "complementos e o segundo recebe a preposição exigida, que se funde ao artigo."
+                    ),
+                },
+            ],
+            "examples": [
+                {
+                    "sentence": "Obedeci às regras.",
+                    "focus": "às regras",
+                    "answer": "Objeto indireto introduzido por a + as.",
+                },
+                {
+                    "sentence": "Cheguei à escola cedo.",
+                    "focus": "à escola",
+                    "answer": "Preposição a mais artigo feminino.",
+                },
+            ],
+            "tip": "Use o teste do masculino e confirme se o termo anterior realmente exige a preposição a.",
+            "quiz": {
+                "question": "Em qual frase a crase está correta?",
+                "options": [
+                    "Entreguei o livro à professora.",
+                    "Começou à estudar.",
+                    "Visitou à cidade.",
+                    "Andou à cavalo.",
+                ],
+                "answer": 0,
+                "explanation": "Entregar algo a alguém exige a preposição, que se une ao artigo feminino.",
+            },
+        },
+        {
+            "id": "colocacao-pronominal",
+            "module": "Norma e construção",
+            "order": 25,
+            "title": "Colocação pronominal",
+            "description": "Próclise, ênclise e mesóclise com pronomes átonos.",
+            "objectives": [
+                "Reconhecer as três posições do pronome átono.",
+                "Identificar palavras que atraem o pronome.",
+                "Empregar o hífen na ênclise e na mesóclise.",
+            ],
+            "sections": [
+                {
+                    "title": "Três posições",
+                    "text": (
+                        "Na próclise, o pronome aparece antes do verbo: não me disseram. Na ênclise, "
+                        "vem depois e se liga por hífen: disseram-me. Na mesóclise, entra no interior "
+                        "de uma forma do futuro: dir-se-á. A escolha depende da estrutura e também "
+                        "do grau de formalidade do texto."
+                    ),
+                },
+                {
+                    "title": "Fatores de atração",
+                    "text": (
+                        "Palavras negativas, pronomes relativos, certos advérbios e conjunções "
+                        "subordinativas costumam favorecer a próclise: nunca me avisaram; o livro "
+                        "que me deram; quando se levantou. No início formal de oração, evita-se "
+                        "começar diretamente por pronome átono."
+                    ),
+                },
+                {
+                    "title": "Função do pronome",
+                    "text": (
+                        "A posição não determina sozinha a função. O, a, os e as normalmente retomam "
+                        "objeto direto; lhe e lhes retomam objeto indireto; me, te, nos e vos dependem "
+                        "da regência e podem exercer mais de uma função. O se pode ser reflexivo, "
+                        "apassivador, indeterminador ou parte integrante do verbo."
+                    ),
+                },
+            ],
+            "examples": [
+                {
+                    "sentence": "Não me contaram a verdade.",
+                    "focus": "me",
+                    "answer": "Próclise provocada pela palavra negativa.",
+                },
+                {
+                    "sentence": "Entreguei-lhe o relatório.",
+                    "focus": "lhe",
+                    "answer": "Ênclise; pronome com função de objeto indireto.",
+                },
+            ],
+            "tip": "Primeiro encontre a função do pronome; depois observe se existe uma palavra que favoreça sua posição.",
+            "quiz": {
+                "question": "Qual frase apresenta ênclise?",
+                "options": [
+                    "Avisaram-me ontem.",
+                    "Não me avisaram.",
+                    "Quem me avisou?",
+                    "Talvez me avisem.",
+                ],
+                "answer": 0,
+                "explanation": "Em avisaram-me, o pronome aparece depois do verbo e se liga por hífen.",
+            },
+        },
+        {
+            "id": "pontuacao-sentido",
+            "module": "Norma e construção",
+            "order": 26,
+            "title": "Pontuação e construção de sentido",
+            "description": "Vírgula, dois-pontos, ponto e vírgula e organização sintática.",
+            "objectives": [
+                "Usar a vírgula sem separar sujeito e verbo.",
+                "Pontuar vocativos, apostos e termos deslocados.",
+                "Relacionar pontuação à estrutura das orações.",
+            ],
+            "sections": [
+                {
+                    "title": "A vírgula organiza",
+                    "text": (
+                        "A vírgula marca deslocamentos, enumerações e termos intercalados, mas não "
+                        "deve separar automaticamente sujeito e predicado. Vocativos e apostos "
+                        "explicativos ficam isolados: Ana, venha aqui; Machado de Assis, grande "
+                        "escritor brasileiro, nasceu no Rio de Janeiro."
+                    ),
+                },
+                {
+                    "title": "Orações",
+                    "text": (
+                        "Orações coordenadas adversativas e conclusivas costumam ser separadas por "
+                        "vírgula. Uma oração adverbial deslocada para o início também costuma recebê-la: "
+                        "Quando cheguei, a aula começou. Orações adjetivas explicativas usam vírgulas; "
+                        "as restritivas, em regra, não usam."
+                    ),
+                },
+                {
+                    "title": "Outros sinais",
+                    "text": (
+                        "Os dois-pontos introduzem explicação, enumeração, fala ou consequência "
+                        "anunciada. O ponto e vírgula separa partes extensas ou já divididas por "
+                        "vírgulas. Travessões e parênteses inserem comentários com graus diferentes "
+                        "de destaque. A pontuação deve tornar visível a estrutura pretendida."
+                    ),
+                },
+            ],
+            "examples": [
+                {
+                    "sentence": "Quando terminou a prova, o aluno saiu.",
+                    "focus": "vírgula",
+                    "answer": "Separa a oração adverbial deslocada.",
+                },
+                {
+                    "sentence": "Os alunos que estudaram passaram.",
+                    "focus": "sem vírgulas",
+                    "answer": "A oração restringe quais alunos passaram.",
+                },
+            ],
+            "tip": "Não pontue apenas pela pausa da fala; identifique os blocos sintáticos da frase.",
+            "quiz": {
+                "question": "Qual frase está pontuada adequadamente?",
+                "options": [
+                    "Quando cheguei, a aula começou.",
+                    "Os alunos, chegaram cedo.",
+                    "A professora explicou, a matéria.",
+                    "Meu amigo venha, aqui.",
+                ],
+                "answer": 0,
+                "explanation": "A vírgula separa a oração adverbial temporal deslocada.",
+            },
+        },
+    ]
+)
+
 
 LESSONS_BY_ID = {lesson["id"]: lesson for lesson in LESSONS}
 
@@ -940,6 +1330,181 @@ EXERCISES = [
         "explanation": "Com verbo transitivo indireto, o se atua como índice de indeterminação do sujeito.",
     },
 ]
+
+EXERCISES.extend(
+    [
+        {
+            "id": 31,
+            "level": "iniciante",
+            "type": "morfossintaxe",
+            "prompt": "Qual processo aparece na palavra destacada?",
+            "sentence": "Ele ficou [infeliz] com o resultado.",
+            "answer": "derivação prefixal",
+            "options": [
+                "derivação prefixal",
+                "composição por justaposição",
+                "derivação regressiva",
+                "composição por aglutinação",
+            ],
+            "explanation": "O prefixo in- foi acrescentado à base feliz.",
+        },
+        {
+            "id": 32,
+            "level": "iniciante",
+            "type": "classe",
+            "prompt": "Qual forma completa corretamente a frase?",
+            "sentence": "Não fui à aula [___] estava doente.",
+            "answer": "porque",
+            "options": ["porque", "por quê", "porquê", "por que"],
+            "explanation": "Porque introduz a causa de não ter ido à aula.",
+        },
+        {
+            "id": 33,
+            "level": "iniciante",
+            "type": "classe",
+            "prompt": "Qual palavra é uma proparoxítona?",
+            "sentence": "Observe a posição da sílaba tônica.",
+            "answer": "médico",
+            "options": ["médico", "café", "papel", "tambor"],
+            "explanation": "Mé-di-co tem a antepenúltima sílaba tônica.",
+        },
+        {
+            "id": 34,
+            "level": "iniciante",
+            "type": "morfossintaxe",
+            "prompt": "Qual frase apresenta ênclise?",
+            "sentence": "Observe a posição do pronome átono.",
+            "answer": "Entregaram-me o documento.",
+            "options": [
+                "Entregaram-me o documento.",
+                "Não me entregaram o documento.",
+                "Quem me entregou o documento?",
+                "Talvez me entreguem o documento.",
+            ],
+            "explanation": "O pronome me aparece depois do verbo e se liga a ele por hífen.",
+        },
+        {
+            "id": 35,
+            "level": "intermediario",
+            "type": "função",
+            "prompt": "Qual alternativa segue a concordância verbal padrão?",
+            "sentence": "Escolha a construção adequada.",
+            "answer": "Faz dois anos que estudo.",
+            "options": [
+                "Faz dois anos que estudo.",
+                "Fazem dois anos que estudo.",
+                "Haviam muitos alunos.",
+                "Existe muitas dúvidas.",
+            ],
+            "explanation": "Fazer indicando tempo decorrido é impessoal e permanece no singular.",
+        },
+        {
+            "id": 36,
+            "level": "intermediario",
+            "type": "função",
+            "prompt": "Por que ocorre crase no trecho destacado?",
+            "sentence": "Entreguei o relatório [à professora].",
+            "answer": "fusão da preposição a com o artigo a",
+            "options": [
+                "fusão da preposição a com o artigo a",
+                "acentuação obrigatória de toda palavra feminina",
+                "marcação de objeto direto",
+                "indicação de verbo no passado",
+            ],
+            "explanation": "Entregar algo a alguém exige a preposição, que se funde ao artigo.",
+        },
+        {
+            "id": 37,
+            "level": "intermediario",
+            "type": "função",
+            "prompt": "Qual é a função do trecho destacado?",
+            "sentence": "Obedecemos [às regras].",
+            "answer": "objeto indireto",
+            "options": [
+                "objeto indireto",
+                "objeto direto",
+                "predicativo do sujeito",
+                "agente da passiva",
+            ],
+            "explanation": "O verbo obedecer exige a preposição a.",
+        },
+        {
+            "id": 38,
+            "level": "intermediario",
+            "type": "função",
+            "prompt": "Por que a vírgula foi usada?",
+            "sentence": "[Quando a aula terminou], os alunos saíram.",
+            "answer": "separar oração adverbial deslocada",
+            "options": [
+                "separar oração adverbial deslocada",
+                "separar sujeito e verbo",
+                "marcar objeto direto",
+                "substituir os dois-pontos",
+            ],
+            "explanation": "A oração temporal veio antes da oração principal.",
+        },
+        {
+            "id": 39,
+            "level": "avancado",
+            "type": "morfossintaxe",
+            "prompt": "Como se classifica a estrutura verbal destacada?",
+            "sentence": "Ela [havia sido avisada].",
+            "answer": "locução verbal na voz passiva analítica",
+            "options": [
+                "locução verbal na voz passiva analítica",
+                "três orações coordenadas",
+                "predicado nominal sem verbo",
+                "voz passiva sintética",
+            ],
+            "explanation": "Havia e sido funcionam como auxiliares, e avisada é o núcleo no particípio.",
+        },
+        {
+            "id": 40,
+            "level": "avancado",
+            "type": "oração",
+            "prompt": "Classifique a oração destacada.",
+            "sentence": "[Ao terminar a prova], o aluno saiu.",
+            "answer": "subordinada adverbial temporal reduzida de infinitivo",
+            "options": [
+                "subordinada adverbial temporal reduzida de infinitivo",
+                "coordenada sindética aditiva",
+                "subordinada substantiva objetiva direta",
+                "subordinada adjetiva explicativa",
+            ],
+            "explanation": "A estrutura indica tempo e apresenta o verbo terminar no infinitivo.",
+        },
+        {
+            "id": 41,
+            "level": "avancado",
+            "type": "oração",
+            "prompt": "Classifique a oração destacada.",
+            "sentence": "A verdade é [que ele mentiu].",
+            "answer": "subordinada substantiva predicativa",
+            "options": [
+                "subordinada substantiva predicativa",
+                "subordinada adverbial causal",
+                "coordenada conclusiva",
+                "subordinada adjetiva restritiva",
+            ],
+            "explanation": "A oração funciona como predicativo do sujeito A verdade.",
+        },
+        {
+            "id": 42,
+            "level": "avancado",
+            "type": "oração",
+            "prompt": "Qual função a oração destacada exerce?",
+            "sentence": "Tenho certeza [de que ele virá].",
+            "answer": "complemento nominal oracional",
+            "options": [
+                "complemento nominal oracional",
+                "objeto direto oracional",
+                "oração coordenada adversativa",
+                "adjunto adverbial de lugar",
+            ],
+            "explanation": "A oração completa o sentido do nome abstrato certeza.",
+        },
+    ]
+)
 
 
 def module_groups():

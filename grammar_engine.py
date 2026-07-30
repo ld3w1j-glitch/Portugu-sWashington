@@ -406,7 +406,7 @@ INTRANSITIVE_VERBS = normalized_set(
 )
 LOCATIVE_VERBS = normalized_set("morar viver ficar permanecer chegar ir voltar")
 ACTION_WITH_SUBJECT_PREDICATIVE = normalized_set(
-    "chegar sair voltar caminhar correr"
+    "chegar sair voltar caminhar correr brincar viver morrer"
 )
 
 # O acento diferencia formas verbais de homônimos muito frequentes:
@@ -420,6 +420,7 @@ ACCENTED_VERB_FORMS = {
     "vê": "ver",
     "têm": "ter",
     "vêm": "vir",
+    "convém": "convir",
 }
 
 
@@ -458,7 +459,7 @@ VERB_FORMS.update(IRREGULAR_FORMS)
 # Camada ampliada do motor 2.0
 # ---------------------------------------------------------------------------
 
-ENGINE_VERSION = "2.0"
+ENGINE_VERSION = "2.1"
 
 EXTRA_REGULAR_VERBS = normalized_set(
     """
@@ -471,7 +472,7 @@ EXTRA_REGULAR_VERBS = normalized_set(
     mostrar obedecer observar oferecer organizar pagar passar perceber permanecer pesquisar
     planejar praticar preparar produzir publicar reconhecer registrar retornar salvar
     significar solicitar terminar tentar utilizar vender viajar visitar bater faltar
-    fumar namorar pertencer preferir prender
+    fumar namorar pertencer preferir prender mentir convir
     """
 )
 
@@ -701,7 +702,7 @@ PERSONAL_SUBJECT_PRONOUNS = normalized_set(
 )
 
 AUXILIARY_VERBS = normalized_set(
-    "ter haver ser estar ir poder dever querer começar continuar deixar acabar voltar"
+    "ter haver ser estar ir poder dever querer precisar começar continuar deixar acabar voltar"
 )
 
 IMPERSONAL_WEATHER_VERBS = normalized_set(
@@ -711,6 +712,10 @@ IMPERSONAL_WEATHER_VERBS = normalized_set(
 SPEECH_COGNITION_VERBS = normalized_set(
     "achar acreditar afirmar compreender considerar dizer entender esperar explicar "
     "imaginar informar perceber perguntar responder saber supor desejar querer"
+)
+
+SUBJECTIVE_CLAUSE_VERBS = normalized_set(
+    "convir importar acontecer ocorrer parecer bastar cumprir"
 )
 
 OBJECT_PREDICATIVE_VERBS = normalized_set(
@@ -825,6 +830,7 @@ VERB_FRAMES = {
     "dormir": {"tipo": "VI", "preps": set()},
     "faltar": {"tipo": "VI", "preps": set()},
     "fumar": {"tipo": "VTD ou VI", "preps": set()},
+    "convir": {"tipo": "VI com oração subjetiva", "preps": set()},
     "entrar": {"tipo": "VI", "preps": set(), "locativo": True},
     "existir": {"tipo": "VI", "preps": set()},
     "ir": {"tipo": "VI", "preps": set(), "locativo": True},
@@ -1578,6 +1584,7 @@ IRREGULAR_PARTICIPLES = {
     "presa": "prender",
     "visto": "ver",
     "vista": "ver",
+    "sido": "ser",
 }
 
 
@@ -1736,6 +1743,21 @@ def _refine_morphology(words: list[WordAnalysis], sentence: str) -> None:
         previous = words[previous_index] if previous_index is not None else None
         following = words[next_index] if next_index is not None else None
         normalized = word.normalized
+
+        if word.classe == "substantivo" and word.confianca <= 60 and normalized.endswith("s"):
+            adjective_candidates = {normalized[:-1]}
+            if normalized.endswith("zes"):
+                adjective_candidates.add(normalized[:-2])
+            if adjective_candidates & COMMON_ADJECTIVES:
+                _set_analysis(
+                    word,
+                    "adjetivo",
+                    "qualificativo flexionado no plural",
+                    "A forma singular pertence ao vocabulário de adjetivos e a terminação marca o plural.",
+                    86,
+                    ["plural", "classe variável"],
+                    ["substantivo em outro contexto"],
+                )
 
         if (
             normalized in PROPER_NOUNS
@@ -2251,10 +2273,12 @@ def _build_verb_groups(words: list[WordAnalysis]) -> list[VerbGroup]:
         auxiliaries: list[str] = []
         head = index
         if not _is_nominal_verb(word) and lemma in AUXILIARY_VERBS:
+            anchor = index
+            auxiliary_lemma = lemma
             for candidate in verb_indices[position + 1 :]:
-                if candidate - index > 5 or candidate in used:
+                if candidate - anchor > 5 or candidate in used:
                     break
-                between = words[index + 1 : candidate]
+                between = words[anchor + 1 : candidate]
                 if any(
                     item.classe not in {"advérbio", "preposição", "pronome"}
                     for item in between
@@ -2262,9 +2286,14 @@ def _build_verb_groups(words: list[WordAnalysis]) -> list[VerbGroup]:
                     break
                 if _is_nominal_verb(words[candidate]):
                     indices.append(candidate)
-                    auxiliaries.append(lemma)
+                    auxiliaries.append(auxiliary_lemma)
                     head = candidate
                     used.add(candidate)
+                    candidate_lemma = _word_lemma(words[candidate])
+                    if candidate_lemma in AUXILIARY_VERBS:
+                        anchor = candidate
+                        auxiliary_lemma = candidate_lemma
+                        continue
                     break
         used.add(index)
         head_lemma = _word_lemma(words[head]) or lemma
@@ -2301,8 +2330,13 @@ def _clause_connector(words: list[WordAnalysis], indices: list[int]) -> int | No
         if (
             word.classe == "preposição"
             and position + 1 < len(indices)
-            and words[indices[position + 1]].classe == "pronome"
-            and "relativo" in words[indices[position + 1]].subclasse
+            and (
+                (
+                    words[indices[position + 1]].classe == "pronome"
+                    and "relativo" in words[indices[position + 1]].subclasse
+                )
+                or words[indices[position + 1]].normalized in {"que", "quem"}
+            )
         ):
             continue
         if word.classe == "conjunção" or (
@@ -2334,9 +2368,14 @@ def _build_clause_spans(
             connector_start = connectors[-1]
             if (
                 connector_start > 0
-                and words[connector_start].classe == "pronome"
-                and "relativo" in words[connector_start].subclasse
                 and words[connector_start - 1].classe == "preposição"
+                and (
+                    (
+                        words[connector_start].classe == "pronome"
+                        and "relativo" in words[connector_start].subclasse
+                    )
+                    or words[connector_start].normalized in {"que", "quem"}
+                )
             ):
                 connector_start -= 1
             starts.append(connector_start)
@@ -2385,6 +2424,14 @@ def _classify_clauses(words: list[WordAnalysis], spans: list[ClauseSpan]) -> Non
         connector = words[span.connector_index] if span.connector_index is not None else None
         connector_word = connector.normalized if connector else ""
         head_word = words[span.verb_group.head_index]
+        lexical_indices = [
+            index for index in span.indices if words[index].classe != "pontuação"
+        ]
+        leading_preposition = (
+            words[lexical_indices[0]].normalized
+            if lexical_indices and words[lexical_indices[0]].classe == "preposição"
+            else ""
+        )
         if (
             position < len(spans) - 1
             and connector is None
@@ -2399,22 +2446,79 @@ def _classify_clauses(words: list[WordAnalysis], spans: list[ClauseSpan]) -> Non
         ):
             span.tipo = "oração subordinada adverbial reduzida de particípio"
             subordinate_found = True
-        elif connector and connector.classe == "pronome" and "relativo" in connector.subclasse:
-            left_comma = span.connector_index > 0 and words[span.connector_index - 1].token == ","
+        elif (
+            position < len(spans) - 1
+            and connector is None
+            and "infinitivo" in head_word.morfologia
+            and leading_preposition
+        ):
+            reduced_relation = {
+                "ao": "temporal",
+                "a": "temporal",
+                "por": "causal",
+                "para": "final",
+                "sem": "modal ou condicional",
+            }.get(leading_preposition, "circunstancial")
             span.tipo = (
-                "oração subordinada adjetiva explicativa"
-                if left_comma
-                else "oração subordinada adjetiva restritiva"
+                "oração subordinada adverbial "
+                f"{reduced_relation} reduzida de infinitivo"
             )
+            subordinate_found = True
+        elif connector and connector.classe == "pronome" and "relativo" in connector.subclasse:
+            free_relative = (
+                position == 0
+                and len(spans) > 1
+                and connector.normalized == "quem"
+                and span.connector_index == lexical_indices[0]
+            )
+            if free_relative:
+                span.tipo = (
+                    "oração subordinada substantiva subjetiva "
+                    "(relativa sem antecedente)"
+                )
+            else:
+                left_comma = (
+                    span.connector_index > 0
+                    and words[span.connector_index - 1].token == ","
+                )
+                span.tipo = (
+                    "oração subordinada adjetiva explicativa"
+                    if left_comma
+                    else "oração subordinada adjetiva restritiva"
+                )
             subordinate_found = True
         elif connector_word in COORDINATING_CONNECTORS:
             span.tipo = "oração " + COORDINATING_CONNECTORS[connector_word]
         elif connector_word == "que":
             previous_group = spans[position - 1].verb_group if position > 0 else None
+            previous_span = spans[position - 1] if position > 0 else None
+            previous_nouns = {
+                words[index].normalized
+                for index in previous_span.indices
+                if previous_span and words[index].classe == "substantivo"
+            } if previous_span else set()
+            explicit_subject_before_ser = bool(
+                previous_group
+                and previous_group.lemma == "ser"
+                and previous_span
+                and any(
+                    index < previous_group.finite_index
+                    and words[index].classe in {
+                        "substantivo",
+                        "pronome",
+                        "numeral",
+                    }
+                    for index in previous_span.indices
+                )
+            )
             if connector and "temporal" in connector.subclasse:
                 span.tipo = "oração subordinada adverbial temporal"
             elif previous_group and previous_group.lemma in SPEECH_COGNITION_VERBS:
                 span.tipo = "oração subordinada substantiva objetiva direta"
+            elif leading_preposition == "de" and previous_nouns & ABSTRACT_NOUNS:
+                span.tipo = "oração subordinada substantiva completiva nominal"
+            elif previous_group and previous_group.lemma in SUBJECTIVE_CLAUSE_VERBS:
+                span.tipo = "oração subordinada substantiva subjetiva"
             elif (
                 previous_group
                 and previous_group.lemma == "ser"
@@ -2424,6 +2528,8 @@ def _classify_clauses(words: list[WordAnalysis], spans: list[ClauseSpan]) -> Non
                 )
             ):
                 span.tipo = "oração subordinada substantiva subjetiva"
+            elif explicit_subject_before_ser:
+                span.tipo = "oração subordinada substantiva predicativa"
             else:
                 span.tipo = "oração subordinada substantiva (hipótese)"
             subordinate_found = True
@@ -2724,6 +2830,18 @@ def _analyze_clause(
     after = [index for index in span.indices if index > group.end]
     if span.connector_index in before:
         before.remove(span.connector_index)
+    connector_preposition_index = (
+        span.connector_index - 1
+        if span.connector_index is not None
+        and span.connector_index - 1 in span.indices
+        and words[span.connector_index - 1].classe == "preposição"
+        else None
+    )
+    if connector_preposition_index in before:
+        before.remove(connector_preposition_index)
+        words[connector_preposition_index].funcao = (
+            "preposição introdutora da oração subordinada"
+        )
 
     before_groups = _nominal_groups(words, before)
     after_groups = _nominal_groups(words, after)
@@ -2784,10 +2902,18 @@ def _analyze_clause(
     subject_modifier_indices: set[int] = set()
     subject_text = ""
     subject_type = ""
+    free_relative_subject = (
+        "relativa sem antecedente" in span.tipo
+        and span.connector_index is not None
+    )
 
     if impersonal:
         subject_text = "oração sem sujeito"
         subject_type = "inexistente"
+    elif free_relative_subject:
+        subject_text = words[span.connector_index].token
+        subject_type = "simples (pronome relativo sem antecedente)"
+        words[span.connector_index].funcao = "núcleo do sujeito"
     elif se_role == "indeterminador":
         subject_text = "sujeito indeterminado"
         subject_type = "indeterminado"
@@ -2963,6 +3089,8 @@ def _analyze_clause(
     } | subject_connector_indices | subject_modifier_indices | {
         index for item in vocative_groups + appositive_groups for index in item["indices"]
     }
+    if connector_preposition_index is not None:
+        excluded.add(connector_preposition_index)
     complement_groups = [
         item
         for item in after_groups
@@ -3398,9 +3526,30 @@ def _syntactic_analysis_v2(words: list[WordAnalysis]) -> dict:
     relation_terms: list[dict] = []
     subordinate_complements: list[dict] = []
     subjective_clauses: list[dict] = []
+    predicative_clauses: list[dict] = []
     for clause in clauses:
         if "subordinada substantiva subjetiva" in clause["tipo"]:
             subjective_clauses.append(clause)
+        elif "subordinada substantiva predicativa" in clause["tipo"]:
+            predicative_clauses.append(clause)
+            relation_terms.append(
+                {
+                    "tipo": "oração com função de predicativo do sujeito",
+                    "texto": clause["texto"],
+                }
+            )
+        elif "subordinada substantiva completiva nominal" in clause["tipo"]:
+            item = {
+                "tipo": "oração com função de complemento nominal",
+                "texto": clause["texto"],
+            }
+            relation_terms.append(item)
+            subordinate_complements.append(
+                {
+                    "tipo": "complemento nominal oracional",
+                    "texto": clause["texto"],
+                }
+            )
         elif "subordinada substantiva objetiva direta" in clause["tipo"]:
             item = {
                 "tipo": "oração com função de objeto direto",
@@ -3445,6 +3594,25 @@ def _syntactic_analysis_v2(words: list[WordAnalysis]) -> dict:
                 "tipo": "oração subordinada substantiva subjetiva",
                 "texto": subject_clause_text,
             },
+        )
+    if predicative_clauses:
+        predicative_text = " e ".join(
+            clause["texto"] for clause in predicative_clauses
+        )
+        primary["tipo_predicado"] = "nominal"
+        primary["predicado"] = (
+            f"{primary['predicado']} {predicative_text}".strip()
+        )
+        for term in primary["termos"]:
+            if term["tipo"].startswith("predicado "):
+                term["tipo"] = "predicado nominal"
+                term["texto"] = primary["predicado"]
+                break
+        primary["termos"].append(
+            {
+                "tipo": "predicativo do sujeito oracional",
+                "texto": predicative_text,
+            }
         )
     primary_predicate = primary["predicado"]
     for complement in subordinate_complements:
@@ -3492,6 +3660,7 @@ def analyze_sentence(sentence: str) -> dict:
     syntax = _syntactic_analysis_v2(words)
     low_confidence = [word.token for word in words if word.confianca < 65]
     ambiguous = [word.token for word in words if word.alternativas]
+    lexical_words = [word for word in words if word.classe != "pontuação"] or words
 
     return {
         "frase": sentence,
@@ -3499,12 +3668,12 @@ def analyze_sentence(sentence: str) -> dict:
         "sintaxe": syntax,
         "qualidade": {
             "confianca_media": round(
-                sum(word.confianca for word in words) / len(words)
+                sum(word.confianca for word in lexical_words) / len(lexical_words)
             ),
             "baixa_confianca": low_confidence,
             "ambiguidades": ambiguous,
             "nota": (
-                "Motor contextual 2.0: regras morfológicas, locuções, regência e divisão "
+                "Motor contextual 2.1: regras morfológicas, locuções, regência e divisão "
                 "de orações. Confira especialmente palavras ambíguas e usos figurados."
             ),
             "versao_motor": ENGINE_VERSION,

@@ -1,10 +1,20 @@
 from __future__ import annotations
 
+import json
 import os
 import random
+from datetime import datetime
 from pathlib import Path
 
-from flask import Flask, abort, jsonify, redirect, render_template, request, url_for
+from flask import (
+    Flask,
+    abort,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 
 from course_data import EXERCISES, LESSONS, LESSONS_BY_ID, module_groups
 from database import Database
@@ -18,7 +28,7 @@ app.config.update(
     JSON_AS_ASCII=False,
     MAX_CONTENT_LENGTH=1 * 1024 * 1024,
 )
-db = Database(BASE_DIR / "data" / "gramatica.db")
+db = Database(Path(os.environ.get("DATABASE_PATH", BASE_DIR / "data" / "gramatica.db")))
 
 
 @app.context_processor
@@ -120,9 +130,16 @@ def lesson(lesson_id: str):
 @app.get("/exercicios")
 def exercises():
     level = request.args.get("nivel", "todos")
+    exercise_type = request.args.get("tipo", "todos")
+    review_errors = request.args.get("revisar") == "erros"
     quantity = max(5, min(20, request.args.get("quantidade", 10, type=int)))
+    incorrect_ids = db.incorrect_exercise_ids()
     available = [
-        exercise for exercise in EXERCISES if level == "todos" or exercise["level"] == level
+        exercise
+        for exercise in EXERCISES
+        if (level == "todos" or exercise["level"] == level)
+        and (exercise_type == "todos" or exercise["type"] == exercise_type)
+        and (not review_errors or exercise["id"] in incorrect_ids)
     ]
     chosen = random.sample(available, min(quantity, len(available)))
     return render_template(
@@ -130,17 +147,45 @@ def exercises():
         title="Exercícios",
         exercises=chosen,
         level=level,
+        exercise_type=exercise_type,
+        review_errors=review_errors,
+        review_count=len(incorrect_ids),
         quantity=quantity,
     )
 
 
 @app.get("/historico")
 def history():
+    query = request.args.get("q", "").strip()
     return render_template(
         "history.html",
         title="Histórico",
-        analyses=db.recent_analyses(100),
+        analyses=db.search_analyses(query, 100),
         stats=db.stats(),
+        query=query,
+    )
+
+
+@app.post("/historico/<int:analysis_id>/excluir")
+def delete_history_item(analysis_id: int):
+    db.delete_analysis(analysis_id)
+    return redirect(url_for("history"))
+
+
+@app.post("/historico/limpar")
+def clear_history():
+    db.clear_analyses()
+    return redirect(url_for("history"))
+
+
+@app.get("/exportar-dados")
+def export_data():
+    content = json.dumps(db.export_data(), ensure_ascii=False, indent=2)
+    filename = f"gramatica-backup-{datetime.now().strftime('%Y-%m-%d')}.json"
+    return app.response_class(
+        content,
+        mimetype="application/json; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
 
@@ -150,8 +195,12 @@ def api_progress():
     lesson_id = payload.get("lesson_id", "")
     if lesson_id not in LESSONS_BY_ID:
         return jsonify({"ok": False, "error": "Aula inválida."}), 400
-    completed = bool(payload.get("completed", False))
-    score = int(payload.get("score", 0))
+    completed = payload.get("completed", False)
+    score = payload.get("score", 0)
+    if not isinstance(completed, bool):
+        return jsonify({"ok": False, "error": "O estado da aula deve ser verdadeiro ou falso."}), 400
+    if isinstance(score, bool) or not isinstance(score, int) or not 0 <= score <= 100:
+        return jsonify({"ok": False, "error": "A pontuação deve estar entre 0 e 100."}), 400
     db.save_progress(lesson_id, completed, score)
     return jsonify({"ok": True, "completed": completed, "score": score})
 

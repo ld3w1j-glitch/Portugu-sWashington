@@ -23,6 +23,16 @@ class WebAppTests(unittest.TestCase):
         self.assertIn("Resultado da análise".encode(), response.data)
         self.assertIn("objeto direto".encode(), response.data)
 
+    def test_advanced_analysis_is_visible(self):
+        response = self.client.post(
+            "/analisador",
+            data={"sentence": "Ela havia sido avisada."},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Voz verbal".encode(), response.data)
+        self.assertIn("voz passiva analítica".encode(), response.data)
+        self.assertIn("Análise de cada oração".encode(), response.data)
+
     def test_progress_api(self):
         response = self.client.post(
             "/api/progresso",
@@ -30,6 +40,26 @@ class WebAppTests(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.get_json()["ok"])
+
+    def test_progress_api_rejects_invalid_types(self):
+        invalid_score = self.client.post(
+            "/api/progresso",
+            json={"lesson_id": "fundamentos", "completed": False, "score": "abc"},
+        )
+        invalid_boolean = self.client.post(
+            "/api/progresso",
+            json={"lesson_id": "fundamentos", "completed": "false", "score": 0},
+        )
+        self.assertEqual(invalid_score.status_code, 400)
+        self.assertEqual(invalid_boolean.status_code, 400)
+
+    def test_exercise_filters_and_export(self):
+        filtered = self.client.get("/exercicios?tipo=oração&nivel=avancado")
+        exported = self.client.get("/exportar-dados")
+        self.assertEqual(filtered.status_code, 200)
+        self.assertIn("Assunto".encode(), filtered.data)
+        self.assertEqual(exported.status_code, 200)
+        self.assertIn("attachment", exported.headers["Content-Disposition"])
 
     def test_health(self):
         response = self.client.get("/saude")

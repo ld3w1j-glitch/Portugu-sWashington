@@ -105,15 +105,24 @@
 
     document.querySelector(".complete-lesson")?.addEventListener("click", async (event) => {
         const button = event.currentTarget;
+        const completed = button.dataset.completed === "true";
+        const nextCompleted = !completed;
         try {
             const response = await fetch("/api/progresso", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({lesson_id: button.dataset.lessonId, completed: true, score: 0}),
+                body: JSON.stringify({
+                    lesson_id: button.dataset.lessonId,
+                    completed: nextCompleted,
+                    score: 0,
+                }),
             });
             if (!response.ok) throw new Error();
-            button.textContent = "Aula concluída ✓";
-            showToast("Progresso salvo.");
+            button.dataset.completed = String(nextCompleted);
+            button.textContent = nextCompleted
+                ? "Aula concluída ✓ · reabrir"
+                : "Marcar aula como concluída";
+            showToast(nextCompleted ? "Aula concluída." : "Aula reaberta.");
         } catch (_) {
             showToast("Não foi possível salvar o progresso.");
         }
