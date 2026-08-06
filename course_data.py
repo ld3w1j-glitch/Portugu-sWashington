@@ -1507,6 +1507,43 @@ EXERCISES.extend(
 )
 
 
+# Mantém o gabarito equilibrado entre A, B, C e D sem alterar o conteúdo
+# das questões. A ordem é determinística para que as alternativas não mudem
+# quando o aluno simplesmente recarrega a página.
+LESSON_ANSWER_SLOTS = [
+    0, 2, 1, 1, 3, 1, 3, 3, 2, 1, 2, 0, 0,
+    1, 1, 0, 2, 2, 0, 3, 3, 3, 2, 0, 0, 1,
+]
+
+EXERCISE_ANSWER_SLOTS = [
+    3, 0, 0, 1, 0, 3, 1, 2, 0, 3, 3, 1, 3, 1,
+    0, 2, 3, 1, 2, 2, 1, 1, 0, 0, 2, 3, 1, 1,
+    2, 2, 0, 0, 0, 1, 1, 3, 2, 0, 2, 3, 2, 3,
+]
+
+
+def _distribute_answer_positions():
+    if len(LESSONS) != len(LESSON_ANSWER_SLOTS):
+        raise ValueError("Atualize LESSON_ANSWER_SLOTS ao adicionar ou remover aulas.")
+    if len(EXERCISES) != len(EXERCISE_ANSWER_SLOTS):
+        raise ValueError("Atualize EXERCISE_ANSWER_SLOTS ao adicionar ou remover exercícios.")
+
+    for lesson, target_slot in zip(LESSONS, LESSON_ANSWER_SLOTS):
+        quiz = lesson["quiz"]
+        correct_option = quiz["options"].pop(quiz["answer"])
+        quiz["options"].insert(target_slot, correct_option)
+        quiz["answer"] = target_slot
+
+    for exercise, target_slot in zip(EXERCISES, EXERCISE_ANSWER_SLOTS):
+        correct_option = exercise["answer"]
+        current_slot = exercise["options"].index(correct_option)
+        exercise["options"].pop(current_slot)
+        exercise["options"].insert(target_slot, correct_option)
+
+
+_distribute_answer_positions()
+
+
 def module_groups():
     groups = []
     for lesson in LESSONS:
