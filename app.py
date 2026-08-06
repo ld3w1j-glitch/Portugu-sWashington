@@ -19,6 +19,7 @@ from flask import (
 from course_data import EXERCISES, LESSONS, LESSONS_BY_ID, module_groups
 from database import Database
 from grammar_engine import CLASS_DESCRIPTIONS, analyze_sentence
+from regency_data import VOLP_URL, all_regency_entries, get_regency_entry, search_regency
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -31,6 +32,20 @@ app.config.update(
 db = Database(Path(os.environ.get("DATABASE_PATH", BASE_DIR / "data" / "gramatica.db")))
 
 
+def regency_guides_for_result(result: dict) -> list[dict]:
+    guides = []
+    seen = set()
+    for clause in result.get("sintaxe", {}).get("oracoes_detalhadas", []):
+        lemma = clause.get("lema", "")
+        if not lemma or lemma in seen:
+            continue
+        seen.add(lemma)
+        entry = get_regency_entry(lemma)
+        if entry:
+            guides.append(entry)
+    return guides
+
+
 @app.context_processor
 def inject_global_data():
     progress = db.progress()
@@ -38,6 +53,7 @@ def inject_global_data():
         "total_lessons": len(LESSONS),
         "completed_lessons": sum(1 for item in progress.values() if item["completed"]),
         "class_descriptions": CLASS_DESCRIPTIONS,
+        "regency_entry_count": len(all_regency_entries()),
     }
 
 
@@ -77,6 +93,7 @@ def analyzer():
         "analyzer.html",
         title="Analisador",
         result=result,
+        regency_guides=regency_guides_for_result(result) if result else [],
         sentence=sentence,
         error=error,
     )
@@ -93,9 +110,28 @@ def saved_analysis(analysis_id: int):
         "analyzer.html",
         title="Análise salva",
         result=result,
+        regency_guides=regency_guides_for_result(result),
         sentence=item["sentence"],
         error=None,
         saved_at=item["created_at"],
+    )
+
+
+@app.get("/regencia")
+def regency_guide():
+    query = request.args.get("q", "").strip()[:80]
+    category = request.args.get("tipo", "todos")
+    if category not in {"todos", "verbal", "nominal"}:
+        category = "todos"
+    entries = search_regency(query, category)
+    return render_template(
+        "regency.html",
+        title="Guia de Regência",
+        entries=entries,
+        total_entries=len(all_regency_entries()),
+        query=query,
+        category=category,
+        volp_url=VOLP_URL,
     )
 
 

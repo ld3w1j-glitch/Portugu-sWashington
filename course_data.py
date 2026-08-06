@@ -1506,6 +1506,171 @@ EXERCISES.extend(
     ]
 )
 
+EXERCISES.extend(
+    [
+        {
+            "id": 43,
+            "level": "iniciante",
+            "type": "regência",
+            "prompt": "Qual preposição completa a regência de gostar?",
+            "sentence": "Eu gosto [___] estudar gramática.",
+            "answer": "de",
+            "options": ["de", "a", "em", "por"],
+            "explanation": "No sentido de ter apreço, gostar é transitivo indireto e rege a preposição de.",
+        },
+        {
+            "id": 44,
+            "level": "iniciante",
+            "type": "regência",
+            "prompt": "Qual preposição é exigida pelo verbo obedecer?",
+            "sentence": "Os alunos obedeceram [___] regras.",
+            "answer": "a",
+            "options": ["a", "de", "com", "para"],
+            "explanation": "Obedecer é transitivo indireto e rege a preposição a: obedecer às regras.",
+        },
+        {
+            "id": 45,
+            "level": "iniciante",
+            "type": "regência",
+            "prompt": "Complete a construção de acordo com a regência de confiar.",
+            "sentence": "Confio [___] sua experiência.",
+            "answer": "em",
+            "options": ["em", "de", "a", "por"],
+            "explanation": "Quando significa ter confiança, confiar rege em: confiar em alguém ou em algo.",
+        },
+        {
+            "id": 46,
+            "level": "iniciante",
+            "type": "regência",
+            "prompt": "Qual preposição completa a regência do nome necessidade?",
+            "sentence": "Há necessidade [___] revisão.",
+            "answer": "de",
+            "options": ["de", "a", "com", "sobre"],
+            "explanation": "O substantivo necessidade seleciona normalmente complemento introduzido por de.",
+        },
+        {
+            "id": 47,
+            "level": "intermediario",
+            "type": "regência",
+            "prompt": "Em registro formal, qual frase usa assistir no sentido de ver corretamente?",
+            "sentence": "Considere o sentido de presenciar.",
+            "answer": "Assistimos ao documentário.",
+            "options": [
+                "Assistimos ao documentário.",
+                "Assistimos no documentário.",
+                "Assistimos do documentário.",
+                "Assistimos pelo documentário.",
+            ],
+            "explanation": "No sentido de ver ou presenciar, assistir rege a preposição a.",
+        },
+        {
+            "id": 48,
+            "level": "intermediario",
+            "type": "regência",
+            "prompt": "Qual frase emprega aspirar no sentido de desejar segundo a regência formal?",
+            "sentence": "Observe a mudança de sentido do verbo.",
+            "answer": "Ela aspira ao cargo de direção.",
+            "options": [
+                "Ela aspira ao cargo de direção.",
+                "Ela aspira o cargo de direção.",
+                "Ela aspira no cargo de direção.",
+                "Ela aspira pelo cargo de direção.",
+            ],
+            "explanation": "Aspirar, no sentido de desejar ou almejar, rege a preposição a.",
+        },
+        {
+            "id": 49,
+            "level": "intermediario",
+            "type": "regência",
+            "prompt": "Qual construção segue a regência tradicional do verbo preferir?",
+            "sentence": "Compare duas preferências.",
+            "answer": "Prefiro leitura a televisão.",
+            "options": [
+                "Prefiro leitura a televisão.",
+                "Prefiro mais leitura que televisão.",
+                "Prefiro leitura do que televisão.",
+                "Prefiro mais leitura a televisão.",
+            ],
+            "explanation": "Na construção formal tradicional, preferir organiza a comparação como preferir X a Y.",
+        },
+        {
+            "id": 50,
+            "level": "intermediario",
+            "type": "regência",
+            "prompt": "Qual frase usa corretamente a forma pronominal de esquecer?",
+            "sentence": "Observe a presença do pronome se.",
+            "answer": "Esqueci-me do compromisso.",
+            "options": [
+                "Esqueci-me do compromisso.",
+                "Esqueci-me o compromisso.",
+                "Esqueci-me ao compromisso.",
+                "Esqueci-me no compromisso.",
+            ],
+            "explanation": "Sem pronome: esquecer algo. Na forma pronominal: esquecer-se de algo.",
+        },
+        {
+            "id": 51,
+            "level": "avancado",
+            "type": "regência",
+            "prompt": "Qual frase usa agradar no sentido de satisfazer?",
+            "sentence": "Nesse sentido, o verbo seleciona complemento com a.",
+            "answer": "A proposta agradou aos alunos.",
+            "options": [
+                "A proposta agradou aos alunos.",
+                "A proposta agradou os alunos com elogios.",
+                "A proposta agradou dos alunos.",
+                "A proposta agradou pelos alunos.",
+            ],
+            "explanation": "Quando significa satisfazer ou ser agradável, agradar é transitivo indireto e rege a.",
+        },
+        {
+            "id": 52,
+            "level": "avancado",
+            "type": "regência",
+            "prompt": "Qual frase apresenta a regência tradicional de visar no sentido de ter por objetivo?",
+            "sentence": "Considere um contexto formal.",
+            "answer": "O projeto visa ao aumento da segurança.",
+            "options": [
+                "O projeto visa ao aumento da segurança.",
+                "O projeto visa o aumento da segurança.",
+                "O projeto visa no aumento da segurança.",
+                "O projeto visa pelo aumento da segurança.",
+            ],
+            "explanation": "No sentido de ter como objetivo, a construção tradicional formal emprega visar a.",
+        },
+        {
+            "id": 53,
+            "level": "avancado",
+            "type": "regência",
+            "prompt": "Qual construção organiza corretamente os dois complementos de informar?",
+            "sentence": "Há uma informação e há um destinatário.",
+            "answer": "Informei o horário aos alunos.",
+            "options": [
+                "Informei o horário aos alunos.",
+                "Informei ao horário os alunos.",
+                "Informei no horário aos alunos.",
+                "Informei dos alunos ao horário.",
+            ],
+            "explanation": "É possível informar algo a alguém: o horário é objeto direto e aos alunos é objeto indireto.",
+        },
+        {
+            "id": 54,
+            "level": "avancado",
+            "type": "regência",
+            "prompt": "Em qual frase a crase resulta da regência nominal?",
+            "sentence": "Procure um nome que exija a preposição a.",
+            "answer": "O parecer foi favorável à proposta.",
+            "options": [
+                "O parecer foi favorável à proposta.",
+                "Começamos à estudar cedo.",
+                "Visitamos à biblioteca ontem.",
+                "Compramos à nova edição.",
+            ],
+            "explanation": "Favorável rege a; proposta admite o artigo a. A fusão a + a produz à.",
+        },
+    ]
+)
+
 
 # Mantém o gabarito equilibrado entre A, B, C e D sem alterar o conteúdo
 # das questões. A ordem é determinística para que as alternativas não mudem
@@ -1519,6 +1684,7 @@ EXERCISE_ANSWER_SLOTS = [
     3, 0, 0, 1, 0, 3, 1, 2, 0, 3, 3, 1, 3, 1,
     0, 2, 3, 1, 2, 2, 1, 1, 0, 0, 2, 3, 1, 1,
     2, 2, 0, 0, 0, 1, 1, 3, 2, 0, 2, 3, 2, 3,
+    2, 0, 3, 1, 1, 3, 0, 2, 3, 2, 1, 0,
 ]
 
 

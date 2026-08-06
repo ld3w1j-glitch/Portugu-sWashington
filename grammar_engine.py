@@ -12,6 +12,8 @@ import unicodedata
 from dataclasses import asdict, dataclass, field
 from typing import Iterable
 
+from regency_data import VERBAL_REGENCY, engine_frames
+
 
 TOKEN_RE = re.compile(
     r"[A-Za-zÀ-ÖØ-öø-ÿ]+(?:[-'][A-Za-zÀ-ÖØ-öø-ÿ]+)*|\d+(?:[.,]\d+)?|[^\w\s]",
@@ -459,7 +461,7 @@ VERB_FORMS.update(IRREGULAR_FORMS)
 # Camada ampliada do motor 2.0
 # ---------------------------------------------------------------------------
 
-ENGINE_VERSION = "2.1"
+ENGINE_VERSION = "2.2"
 
 EXTRA_REGULAR_VERBS = normalized_set(
     """
@@ -474,6 +476,11 @@ EXTRA_REGULAR_VERBS = normalized_set(
     significar solicitar terminar tentar utilizar vender viajar visitar bater faltar
     fumar namorar pertencer preferir prender mentir convir
     """
+)
+EXTRA_REGULAR_VERBS.update(
+    normalize(data.get("lema_motor", lemma).removesuffix("-se"))
+    for lemma, data in VERBAL_REGENCY.items()
+    if data.get("lema_motor", lemma).removesuffix("-se").endswith(("ar", "er", "ir"))
 )
 
 for _lemma in EXTRA_REGULAR_VERBS:
@@ -846,6 +853,11 @@ VERB_FRAMES = {
     "permanecer": {"tipo": "VL ou VI", "preps": set(), "locativo": True},
     "continuar": {"tipo": "VL ou auxiliar", "preps": set()},
 }
+
+for _lemma, _guide_frame in engine_frames().items():
+    _frame = VERB_FRAMES.setdefault(_lemma, {})
+    _frame["tipo"] = _guide_frame["tipo"]
+    _frame["preps"] = _guide_frame["preps"]
 
 
 CLASS_DESCRIPTIONS = {
@@ -3673,7 +3685,7 @@ def analyze_sentence(sentence: str) -> dict:
             "baixa_confianca": low_confidence,
             "ambiguidades": ambiguous,
             "nota": (
-                "Motor contextual 2.1: regras morfológicas, locuções, regência e divisão "
+                "Motor contextual 2.2: regras morfológicas, locuções, regência e divisão "
                 "de orações. Confira especialmente palavras ambíguas e usos figurados."
             ),
             "versao_motor": ENGINE_VERSION,

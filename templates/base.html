@@ -29,6 +29,9 @@
                 <a class="{{ 'active' if request.endpoint in ['analyzer', 'saved_analysis'] }}" href="{{ url_for('analyzer') }}">
                     <span class="nav-icon">⌕</span> Analisador
                 </a>
+                <a class="{{ 'active' if request.endpoint == 'regency_guide' }}" href="{{ url_for('regency_guide') }}">
+                    <span class="nav-icon">R</span> Regência
+                </a>
                 <a class="{{ 'active' if request.endpoint in ['course', 'lesson'] }}" href="{{ url_for('course') }}">
                     <span class="nav-icon">▤</span> Curso
                 </a>

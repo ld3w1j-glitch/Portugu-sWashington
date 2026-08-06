@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header regency-header">
+    <div>
+        <span class="eyebrow">Dicionário didático</span>
+        <h1>Guia de Regência</h1>
+        <p>Descubra qual preposição um verbo ou nome pede e entenda como o sentido pode mudar a construção.</p>
+    </div>
+    <div class="regency-count">
+        <strong>{{ total_entries }}</strong>
+        <span>verbetes internos</span>
+    </div>
+</section>
+
+<section class="volp-panel panel">
+    <div>
+        <span class="eyebrow">Ortografia oficial</span>
+        <h2>Conferir palavra no VOLP</h2>
+        <p>Use o Vocabulário Ortográfico da Academia Brasileira de Letras para confirmar grafia e classificação. A consulta oficial abre na internet.</p>
+    </div>
+    <a class="button secondary" href="{{ volp_url }}" target="_blank" rel="noopener noreferrer">Abrir VOLP oficial ↗</a>
+</section>
+
+<form class="regency-search panel" method="get" action="{{ url_for('regency_guide') }}">
+    <label for="regency-query">Pesquisar verbo, nome, preposição ou exemplo
+        <input id="regency-query" name="q" value="{{ query }}" maxlength="80" placeholder="Ex.: assistir, obedecer, de, confiança...">
+    </label>
+    <label for="regency-type">Tipo
+        <select id="regency-type" name="tipo">
+            <option value="todos" {{ 'selected' if category == 'todos' }}>Todos</option>
+            <option value="verbal" {{ 'selected' if category == 'verbal' }}>Regência verbal</option>
+            <option value="nominal" {{ 'selected' if category == 'nominal' }}>Regência nominal</option>
+        </select>
+    </label>
+    <button class="button primary" type="submit">Pesquisar</button>
+    {% if query or category != 'todos' %}<a class="text-link" href="{{ url_for('regency_guide') }}">Limpar</a>{% endif %}
+</form>
+
+<div class="regency-result-heading">
+    <div>
+        <span class="eyebrow">Consulta interna</span>
+        <h2>{{ entries|length }} resultado{{ '' if entries|length == 1 else 's' }}</h2>
+    </div>
+    <p>VTD = transitivo direto · VTI = transitivo indireto · VTDI = direto e indireto.</p>
+</div>
+
+{% if entries %}
+<section class="regency-grid">
+    {% for entry in entries %}
+    <article class="regency-card panel" id="verbete-{{ entry.termo|replace(' ', '-') }}">
+        <header>
+            <div>
+                <span class="regency-category">Regência {{ entry.categoria }}</span>
+                <h2>{{ entry.termo }}</h2>
+            </div>
+            <span class="regency-class">{{ entry.classe }}</span>
+        </header>
+
+        <div class="regency-senses">
+            {% for sense in entry.regencias %}
+            <section class="regency-sense">
+                <div class="regency-sense-top">
+                    <strong>{{ sense.sentido }}</strong>
+                    <span>{{ sense.classificacao }}</span>
+                </div>
+                <dl>
+                    <div><dt>Construção</dt><dd>{{ sense.estrutura }}</dd></div>
+                    <div><dt>Preposição</dt><dd>{{ sense.preposicao }}</dd></div>
+                </dl>
+                <p class="regency-example">“{{ sense.exemplo }}”</p>
+                {% if sense.observacao %}<p class="regency-observation">{{ sense.observacao }}</p>{% endif %}
+            </section>
+            {% endfor %}
+        </div>
+    </article>
+    {% endfor %}
+</section>
+{% else %}
+<section class="empty-state panel">
+    <span>R</span>
+    <h2>Ainda não há verbete para essa busca</h2>
+    <p>Tente somente o infinitivo do verbo, como “assistir”, “preferir” ou “obedecer”.</p>
+    <a class="button primary" href="{{ url_for('regency_guide') }}">Ver todos os verbetes</a>
+</section>
+{% endif %}
+
+<section class="regency-method panel">
+    <span class="eyebrow">Como estudar</span>
+    <h2>Não decore só a preposição</h2>
+    <p>Leia primeiro o sentido, depois identifique a estrutura e só então observe a preposição. Em verbos como <strong>assistir</strong>, <strong>aspirar</strong> e <strong>visar</strong>, mudar o sentido pode mudar também a regência.</p>
+</section>
+{% endblock %}
